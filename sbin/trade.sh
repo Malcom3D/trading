@@ -14,14 +14,14 @@ start() {
 	merge_config
 	if ! [ "$(status)" ]
 	then
-		screen -dmS $MARKET ../../sbin/$ScriptName trade $MARKET
+		screen -dmS $MARKET $DirName/../sbin/$ScriptName trade $MARKET
 		echo $?
 	fi
 	cd - &>/dev/null
 }
 
 trade() {
-	source ../bin/activate
+	source $DirName/../bin/activate
 	rotate_log $MARKET
 
 	# --buymaxsize --enableml
@@ -39,7 +39,7 @@ stop() {
 
 enable() {
 	cd $ENABLED
-	ln -s ../availlable/$MARKET.json
+	ln -s $DirName/../availlable/$MARKET.json
 	echo $?
 	cd - &>/dev/null
 }
@@ -61,7 +61,7 @@ rotate_log() {
                 if [ -n "$lastOld" ] && [ -e "../logs/$lastOld" ]
                 then
                         version=$[ $k +1 ]
-                        mv ../logs/$lastOld ../logs/$MARKET.log.$version
+                        mv $DirName/../logs/$lastOld $DirName/../logs/$MARKET.log.$version
                 fi
         done
 }
@@ -85,7 +85,7 @@ log() {
 		for l in $LOGS
 		do
 			echo "==> $l.log <=="
-			tail -n 100 ../logs/$l.log | egrep -v "$l$|EUR$|^$|DEBUG" | tail -n $lines
+			tail -n 100 $DirName/../logs/$l.log | egrep -v "$l$|EUR$|^$|DEBUG" | tail -n $lines
 		done
 	fi
 }
