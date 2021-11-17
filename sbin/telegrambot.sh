@@ -241,20 +241,23 @@ start_answer() {
 }
 
 start_all() {
-	local TEXT="Starting all enabled bot."
-        change_last_msg "$TEXT"
-
        	local enabled=$(ls ../etc/config.d/enabled/ | sed 's/\.json//')
-	for i in $enabled
-	do
-		if [ "$(./trade.sh start $i)" ]
-		then
-	                local TEXT="$i bot started."
-		else
-	                local TEXT="WARNING: error starting $i bot."
-		fi
-		send_msg "$TEXT"
-	done
+	if [ -n "$enabled" ]
+		local TEXT="Starting all enabled bot."
+	        change_last_msg "$TEXT"
+		for i in $enabled
+		do
+			if [ "$(./trade.sh start $i)" ]
+			then
+		                local TEXT="$i bot started."
+			else
+		                local TEXT="WARNING: error starting $i bot."
+			fi
+		done
+	else
+		local TEXT="No bot enabled."
+	fi
+	send_msg "$TEXT"
 }
 
 stop_quest() {
