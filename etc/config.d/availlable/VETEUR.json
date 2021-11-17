@@ -1,0 +1,1 @@
+{ "binance": { "api_url": "https://api.binance.com", "api_key_file": "../key/binance.key", "config": { "live": 1, "sellatloss": 0, "enableinsufficientfundslogging": 1, "base_currency": "VET", "quote_currency": "EUR", "disablebullonly": 0, "disablebuynearhigh": 1 } } }

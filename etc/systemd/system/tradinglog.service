@@ -1,0 +1,14 @@
+[Unit]
+Description=Trading system log on console
+After=getty.target
+Conflicts=getty@tty1.service
+
+[Service]
+User=trader
+ExecStart=/usr/bin/watch /home/trader/trading/sbin/trade.sh log
+StandardInput=tty-force
+StandardOutput=inherit
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

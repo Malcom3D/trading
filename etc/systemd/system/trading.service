@@ -1,0 +1,9 @@
+[Unit]
+Description=Daemon to start trading system solution
+
+[Service]
+User=trader
+ExecStart=/home/trader/trading/sbin/daemon.sh
+
+[Install]
+WantedBy=multi-user.target
