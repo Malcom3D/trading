@@ -98,8 +98,8 @@ new_quest() {
 	local BUTTONS=""
 
 	local count=0
-	local list=$(ls ../etc/config.d/availlable | sed 's/EUR\.json//')
-	for i in $(ls ../etc/config.d/enabled/ | sed 's/EUR\.json//')
+	local list=$(ls ../etc/config.d/availlable | grep "\.json" | sed 's/EUR\.json//')
+	for i in $(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
 	do
 		local list=$(echo $list | sed "s/$i //")
 	done
@@ -146,7 +146,7 @@ del_quest() {
         local BUTTONS=""
 
         local count=0
-        local list=$(ls ../etc/config.d/enabled/ | sed 's/EUR\.json//')
+        local list=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
 
         for l in $list
         do
@@ -191,7 +191,7 @@ start_quest() {
 	local ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled") $CANCEL)
 
         local count=0
-        local list=$(ls ../etc/config.d/enabled/ | sed 's/EUR\.json//')
+        local list=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
 
         for l in $list
         do
@@ -241,7 +241,7 @@ start_answer() {
 }
 
 start_all() {
-       	local enabled=$(ls ../etc/config.d/enabled/ | sed 's/\.json//')
+       	local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
 	if [ -n "$enabled" ]
 	then
 		local TEXT="Starting all enabled bot."
@@ -267,7 +267,7 @@ stop_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-        local enabled=$(ls ../etc/config.d/enabled/ | sed 's/EUR\.json//')
+        local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
 
         for l in $enabled
         do
@@ -320,7 +320,7 @@ stop_all() {
 	local TEXT="Stopping all started bot."
 	change_last_msg "$TEXT"
 
-	local enabled=$(ls ../etc/config.d/enabled/ | sed 's/\.json//')
+	local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
 	for i in $enabled
 	do
 		if [ "$(./trade.sh status $i)" ]
@@ -342,7 +342,7 @@ restart_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-        local enabled=$(ls ../etc/config.d/enabled/ | sed 's/EUR\.json//')
+        local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
 
         for l in $enabled
         do
@@ -396,7 +396,7 @@ restart_answer() {
                 local TEXT="Restart all enabled bot."
                 change_last_msg "$TEXT"
 
-                local enabled=$(ls ../etc/config.d/enabled/ | sed 's/\.json//')
+                local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
                 for i in $enabled
                 do
                         if [ "$(./trade.sh status $i)" ]
@@ -451,7 +451,7 @@ get_answer() {
 }
 
 get_status() {
-        local enabled=$(ls ../etc/config.d/enabled/ | sed 's/\.json//')
+        local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
 
         for l in $enabled
         do
@@ -468,7 +468,7 @@ get_status() {
 }
 
 get_margin() {
-	local enabled=$(ls ../etc/config.d/enabled/ | sed 's/\.json//')
+	local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
 	
 	for l in $enabled
 	do
