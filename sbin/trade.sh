@@ -25,7 +25,7 @@ trade() {
 	rotate_log $MARKET
 
 	# --buymaxsize --enableml
-	until python3.9 pycryptobot.py --config /tmp/$MARKET.json --websocket --buymaxsize 50 --logfile ../logs/$MARKET.log --tradesfile ../logs/tracker/$MARKET.csv;
+	until python3.9 pycryptobot.py --config /tmp/$MARKET.json --websocket --buymaxsize 50 --logfile $DirName/../logs/$MARKET.log --tradesfile $DirName/../logs/tracker/$MARKET.csv;
 	do
 		curl -s "https://api.telegram.org/bot$API_KEY/sendMessage?chat_id=$CHAT_ID&text=Warning: respawning $MARKET process"
 		sleep 1
