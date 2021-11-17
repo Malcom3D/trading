@@ -1,5 +1,4 @@
 bin/*
-etc/keys/*
 include/*
 lib/*
 !lib/cryptobot
