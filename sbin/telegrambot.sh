@@ -236,21 +236,25 @@ start_answer() {
 	        change_last_msg "$TEXT"
         elif [ -n "$ANSWER" ] && [ "$ANSWER" == "all_enabled" ]
 	then
-                local TEXT="Starting all enabled bot."
-                change_last_msg "$TEXT"
+		start_all
+	fi
+}
 
-        	local enabled=$(ls ../etc/config.d/enabled/ | sed 's/\.json//')
-		for i in $enabled
-		do
-			if [ "$(./trade.sh start $i)" ]
-			then
-		                local TEXT="$i bot started."
-			else
-		                local TEXT="WARNING: error starting $i bot."
-			fi
-			send_msg "$TEXT"
-		done
-        fi
+start_all() {
+	local TEXT="Starting all enabled bot."
+        change_last_msg "$TEXT"
+
+       	local enabled=$(ls ../etc/config.d/enabled/ | sed 's/\.json//')
+	for i in $enabled
+	do
+		if [ "$(./trade.sh start $i)" ]
+		then
+	                local TEXT="$i bot started."
+		else
+	                local TEXT="WARNING: error starting $i bot."
+		fi
+		send_msg "$TEXT"
+	done
 }
 
 stop_quest() {
@@ -502,7 +506,8 @@ get_trades() {
 }
 
 log "INFO: Starting..."
-send_msg "Your automatic trading solution is up&runnning"
+send_msg "Starting all enabled bot..."
+start_all
 
 # update menu list with commands
 log "DEBUG: Updating Menu"
@@ -510,6 +515,8 @@ update_menu
 
 # set init var
 LAST_MSG=$(last_msg)
+
+send_msg "Your automatic trading solution is up&runnning"
 
 log "DEBUG: starting main loop"
 while true
