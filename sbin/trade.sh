@@ -10,12 +10,11 @@ source $DirName/../etc/keys/telegram.key
 # Define function
 
 start() {
-	cd ../cryptobot
-	git pull &>/dev/null
+	cd ../lib/cryptobot
 	merge_config
 	if ! [ "$(status)" ]
 	then
-		screen -dmS $MARKET .$ScriptName trade $MARKET
+		screen -dmS $MARKET ../../sbin/$ScriptName trade $MARKET
 		echo $?
 	fi
 	cd - &>/dev/null
@@ -40,7 +39,6 @@ stop() {
 
 enable() {
 	cd $ENABLED
-	git pull &>/dev/null
 	ln -s ../availlable/$MARKET.json
 	echo $?
 	cd - &>/dev/null
@@ -103,8 +101,12 @@ merge_config() {
 	echo $JSON > /tmp/$MARKET.json
 }
 
-# Check passed argument
+init_git() {
+        cd $DirName/../
+        git pull --recurse-submodules &>/dev/null
+}
 
+# Check passed argument
 if [ "$1" != "log" ] && [ -z "$2" ]
 then
 	exit 1
@@ -117,6 +119,7 @@ case $1 in
 		trade
 	;;
 	start)
+		init_git
 		start
 	;;
 	stop)
@@ -127,9 +130,11 @@ case $1 in
 	;;
 	restart)
 		stop
+		init_git
 		start
 	;;
 	enable)
+		init_git
 		enable
 	;;
 	disable)

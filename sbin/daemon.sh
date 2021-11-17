@@ -17,6 +17,11 @@ init_TelegramBot() {
 	screen -dmS TelegramBot ./telegrambot.sh
 }
 
+init_git() {
+	cd $DirName/../
+	git pull --recurse-submodules &>/dev/null
+}
+
 exit_all() {
 	screen -S ipCheck -X quit
 	screen -S TelegramBot -X quit
@@ -24,6 +29,7 @@ exit_all() {
 }
 
 init() {
+	init_git
 	while true
 	do
 		screen -wipe &>/dev/null
