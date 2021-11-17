@@ -243,6 +243,7 @@ start_answer() {
 start_all() {
        	local enabled=$(ls ../etc/config.d/enabled/ | sed 's/\.json//')
 	if [ -n "$enabled" ]
+	then
 		local TEXT="Starting all enabled bot."
 	        change_last_msg "$TEXT"
 		for i in $enabled
