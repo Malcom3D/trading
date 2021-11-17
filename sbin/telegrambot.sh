@@ -236,6 +236,8 @@ start_answer() {
 	        change_last_msg "$TEXT"
         elif [ -n "$ANSWER" ] && [ "$ANSWER" == "all_enabled" ]
 	then
+		local TEXT="Starting all enabled bot."
+	        change_last_msg "$TEXT"
 		start_all
 	fi
 }
@@ -244,8 +246,6 @@ start_all() {
        	local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
 	if [ -n "$enabled" ]
 	then
-		local TEXT="Starting all enabled bot."
-	        change_last_msg "$TEXT"
 		for i in $enabled
 		do
 			if [ "$(./trade.sh start $i)" ]
@@ -312,13 +312,13 @@ stop_answer() {
                 change_last_msg "$TEXT"
         elif [ -n "$ANSWER" ] && [ "$ANSWER" == "all_started" ]
         then
+		local TEXT="Stopping all started bot."
+		change_last_msg "$TEXT"
 		stop_all
 	fi
 }
 
 stop_all() {
-	local TEXT="Stopping all started bot."
-	change_last_msg "$TEXT"
 
 	local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
 	for i in $enabled
