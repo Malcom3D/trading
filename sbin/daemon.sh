@@ -20,6 +20,8 @@ init_TelegramBot() {
 init_git() {
 	cd $DirName/../
 	git pull --recurse-submodules &>/dev/null
+	cd $DirName/../lib/cryptobot
+	python -m pip install -r requirements.txt -U
 }
 
 exit_all() {
