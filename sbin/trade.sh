@@ -10,7 +10,7 @@ source $DirName/../etc/keys/telegram.key
 # Define function
 
 start() {
-	cd ../lib/cryptobot
+	cd $DirName/../lib/cryptobot/
 	merge_config
 	if ! [ "$(status)" ]
 	then
