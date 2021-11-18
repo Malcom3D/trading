@@ -218,6 +218,11 @@ del_answer() {
 
 start_quest() {
 	local enabled="$(bot_enabled)"
+	local started="$(bot_started)"
+	for i in "$started"
+	do
+		local enabled=$(echo $enabled | sed 's/$i//')
+	done
 	if [ -n "$enabled" ]
 	then
 		for i in "$enabled"
@@ -257,6 +262,11 @@ start_answer() {
 
 start_all() {
 	local enabled="$(bot_enabled)"
+	local started="$(bot_started)"
+	for i in "$started"
+	do
+		local enabled=$(echo $enabled | sed 's/$i//')
+	done
 	if [ -n "$enabled" ]
 	then
 		for i in $enabled
@@ -312,19 +322,25 @@ stop_answer() {
 
 stop_all() {
 	local enabled="$(bot_enabled)"
-	for i in $enabled
-	do
-		if [ "$(./trade.sh status "$i"EUR)" ]
-		then
-                       	if [ "$(./trade.sh stop "$i"EUR)" ]
+	if [ -n "$enabled" ]
+	then
+		for i in $enabled
+		do
+			if [ "$(./trade.sh status "$i"EUR)" ]
 			then
-				local TEXT="$i bot stopped."
-			else
-				local TEXT="WARNING: error stopping $i bot stopped."
+	                       	if [ "$(./trade.sh stop "$i"EUR)" ]
+				then
+					local TEXT="$i bot stopped."
+				else
+					local TEXT="WARNING: error stopping $i bot stopped."
+				fi
+	                       	send_msg "$TEXT"
 			fi
-                       	send_msg "$TEXT"
-		fi
-	done
+		done
+	else
+		local TEXT="No running bot."
+		send_msg "$TEXT"
+	fi
 }
 
 restart_quest() {
@@ -426,7 +442,7 @@ get_margin() {
 	then
 		for l in $started
 		do
-			local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
+			local info=$(tail -n 12 ../logs/"$l"EUR.log | grep INFO | tail -1)
 			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
 			local margin=$(echo $info | grep "Margin" | cut -d"|" -f5 | cut -d":" -f2)
 			local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
