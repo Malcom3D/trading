@@ -223,7 +223,7 @@ start_quest() {
 	log "DEBUG: started: $started"
 	for i in $started
 	do
-		local enabled=$(echo $enabled | sed 's/$i//')
+		local enabled=$(echo $enabled | sed '/$i/d')
 	done
 	if [ -n "$enabled" ]
 	then
