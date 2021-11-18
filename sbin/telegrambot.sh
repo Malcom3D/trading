@@ -219,12 +219,11 @@ del_answer() {
 start_quest() {
 	local enabled="$(bot_enabled)"
 	local started="$(bot_started)"
-	log "DEBUG: enabled: $enabled"
-	log "DEBUG: started: $started"
 	for i in $started
 	do
-		local enabled=$(echo $enabled | sed '/$i/d')
+		local enabled=$(echo "$enabled" | sed 's/$i//')
 	done
+	log "DEBUG: non started: $enabled"
 	if [ -n "$enabled" ]
 	then
 		local ROW=""
