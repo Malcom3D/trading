@@ -219,7 +219,7 @@ del_answer() {
 start_quest() {
 	local enabled="$(bot_enabled)"
 	local started="$(bot_started)"
-	for i in "$started"
+	for i in $started
 	do
 		local enabled=$(echo $enabled | sed 's/$i//')
 	done
@@ -481,8 +481,6 @@ log "INFO: Starting..."
 # update menu list with commands
 log "DEBUG: Updating Menu"
 update_menu
-
-log "DEBUG: bot_started: $(bot_started)"
 
 # set init var
 LAST_MSG=$(last_msg)
