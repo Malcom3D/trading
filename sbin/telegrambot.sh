@@ -225,14 +225,11 @@ start_quest() {
 	done
 	if [ -n "$enabled" ]
 	then
-		for i in "$enabled"
-		do
-			local ROW=""
-			put_in_row "$enabled"
-		        local ROW="$ALL_ENABLED $ROW"
-		        send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-			start_answer
-		done
+		local ROW=""
+		put_in_row "$enabled"
+		local ROW="$ALL_ENABLED $ROW"
+		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+		start_answer
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
