@@ -229,7 +229,6 @@ del_answer() {
 
 start_quest() {
 	local unstarted="$(bot_unstarted)"
-	log "DEBUG: non started: $unstarted"
 	if [ -n "$unstarted" ]
 	then
 		local ROW=""
