@@ -126,6 +126,7 @@ put_in_row() {
 			local count=0
 		fi
 	done
+	echo $ROW
 	log "$ROW"
 }
 
@@ -143,6 +144,7 @@ new_quest() {
 #		send_msg "$TEXT"
 #	fi
 	local enabled=$(json_enabled)
+	log "$enabled"
 	local availlable=$(ls ../etc/config.d/availlable/ | grep ".json" | sed 's/EUR\.json//')
 	for i in $enabled
 	do
