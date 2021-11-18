@@ -13,6 +13,7 @@ MENU_URL="$BASE_URL/setMyCommands"
 # Common options
 CANCEL=$(jo text="Cancel" callback_data="cancel")
 ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled"))
+ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started"))
 CONTENT="Content-Type: application/json"
 
 
