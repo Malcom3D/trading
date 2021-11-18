@@ -168,8 +168,8 @@ new_quest() {
 #		fi
 #	done
 #	local ROW="$(jo -a $CANCEL) $ROW"
-	local in_row="$(put_in_row $availlable)
-	ROW="$(jo -a $CANCEL) $in_row)"
+	local in_row="$(put_in_row $availlable)"
+	ROW="$(jo -a $CANCEL) $in_row"
 	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
 
