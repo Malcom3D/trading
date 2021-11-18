@@ -1,4 +1,8 @@
 bin/*
+etc/keys/**
+!etc/keys/README.md
+etc/config.d/enabled/**
+!etc/config.d/enabled/README.md
 include/*
 lib/*
 !lib/cryptobot
