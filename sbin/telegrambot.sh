@@ -106,7 +106,7 @@ json_enabled() {
 }
 
 put_in_row() {
-	ROW=""
+	local ROW=""
 	local BUTTONS=""
 	local count=0
 	for l in $1
@@ -116,18 +116,17 @@ put_in_row() {
 
 		if [ "$count" -eq 4 ] && [ -z "$ROW" ]
 		then
-			ROW="$(jo -a $BUTTONS)"
+			local ROW="$(jo -a $BUTTONS)"
 			local BUTTONS=""
 			local count=0
 		elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
 		then
-			ROW="$ROW $(jo -a $BUTTONS)"
+			local ROW="$ROW $(jo -a $BUTTONS)"
 			local BUTTONS=""
 			local count=0
 		fi
 	done
 	echo $ROW
-	log "$ROW"
 }
 
 new_quest() {
@@ -169,7 +168,8 @@ new_quest() {
 #		fi
 #	done
 #	local ROW="$(jo -a $CANCEL) $ROW"
-	ROW="$(jo -a $CANCEL) $(put_in_row $availlable)"
+	local in_row="$(put_in_row $availlable)
+	ROW="$(jo -a $CANCEL) $in_row)"
 	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
 
