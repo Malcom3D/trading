@@ -126,6 +126,7 @@ put_in_row() {
 			local count=0
 		fi
 	done
+	log "$ROW"
 }
 
 new_quest() {
