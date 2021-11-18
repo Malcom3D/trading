@@ -94,43 +94,79 @@ update_msg() {
         done
 }
 
-new_quest() {
-	local ROW=""
-	local BUTTONS=""
-	local count=0
-
+json_enabled() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
+        	echo $(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
 	fi
-	local availlable=$(ls ../etc/config.d/availlable/ | grep ".json" | sed 's/EUR\.json//')
-	for i in $enabled
-	do
-		local availlable=$(echo $availlable | sed "s/$i //")
-	done
+}
 
-	for l in $availlable
+put_in_row() {
+	ROW=""
+	local BUTTONS=""
+	local count=0
+	for l in $1
 	do
 		local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
 		((count+=1))
 
 		if [ "$count" -eq 4 ] && [ -z "$ROW" ]
 		then
-			local ROW="$(jo -a $BUTTONS)"
+			ROW="$(jo -a $BUTTONS)"
 			local BUTTONS=""
 			local count=0
 		elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
 		then
-			local ROW="$ROW $(jo -a $BUTTONS)"
+			ROW="$ROW $(jo -a $BUTTONS)"
 			local BUTTONS=""
 			local count=0
 		fi
 	done
-	local ROW="$(jo -a $CANCEL) $ROW"
+}
+
+new_quest() {
+#	local ROW=""
+#	local BUTTONS=""
+#	local count=0
+
+#	local files=(../etc/config.d/enabled/*.json)
+#	if [ -e "${files[0]}" ]
+#	then
+#        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
+#	else
+#		local TEXT="No bot enabled"
+#		send_msg "$TEXT"
+#	fi
+	local enabled=$(json_enabled)
+	local availlable=$(ls ../etc/config.d/availlable/ | grep ".json" | sed 's/EUR\.json//')
+	for i in $enabled
+	do
+		local availlable=$(echo $availlable | sed "s/$i //")
+	done
+
+#	for l in $availlable
+#	do
+#		local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
+#		((count+=1))
+#
+#		if [ "$count" -eq 4 ] && [ -z "$ROW" ]
+#		then
+#			local ROW="$(jo -a $BUTTONS)"
+#			local BUTTONS=""
+#			local count=0
+#		elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
+#		then
+#			local ROW="$ROW $(jo -a $BUTTONS)"
+#			local BUTTONS=""
+#			local count=0
+#		fi
+#	done
+#	local ROW="$(jo -a $CANCEL) $ROW"
+	ROW="$(jo -a $CANCEL) $(put_in_row $availlable)"
 	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
 
