@@ -102,7 +102,7 @@ bot_started() {
 	then
 		for i in "$enabled"
 		do
-			if [ "$(./trade.sh status "$i"EUR > /dev/null 2>&1)" ]
+			if [ "$(./trade.sh status "$i"EUR)" ]
 			then
 				local started="$started $i"
 			fi
@@ -484,6 +484,8 @@ log "INFO: Starting..."
 # update menu list with commands
 log "DEBUG: Updating Menu"
 update_menu
+
+log "DEBUG: bot_started: $(bot_started)"
 
 # set init var
 LAST_MSG=$(last_msg)
