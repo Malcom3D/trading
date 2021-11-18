@@ -143,12 +143,12 @@ new_quest() {
 #		send_msg "$TEXT"
 #	fi
 	local enabled=$(json_enabled)
-	log "$enabled"
 	local availlable=$(ls ../etc/config.d/availlable/ | grep ".json" | sed 's/EUR\.json//')
 	for i in $enabled
 	do
 		local availlable=$(echo $availlable | sed "s/$i //")
 	done
+	log "$availlable"
 
 #	for l in $availlable
 #	do
@@ -169,6 +169,7 @@ new_quest() {
 #	done
 #	local ROW="$(jo -a $CANCEL) $ROW"
 	local in_row="$(put_in_row $availlable)"
+	log "$in_row"
 	ROW="$(jo -a $CANCEL) $in_row"
 	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
