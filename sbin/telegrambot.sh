@@ -12,7 +12,7 @@ MENU_URL="$BASE_URL/setMyCommands"
 
 # Common options
 CANCEL=$(jo text="Cancel" callback_data="cancel")
-CONTENT="Content-Type: application/json"
+CONTENT="Content-Type: application/json
 
 # logger funtion
 log() {
@@ -94,7 +94,7 @@ update_msg() {
 }
 
 enabled_crypto(){
-	echo "$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')"
+	echo "$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')"
 }
 
 put_in_row(){
@@ -124,7 +124,7 @@ new_quest() {
 	local BUTTONS=""
 
 	local count=0
-	local availlable=$(ls ../etc/config.d/availlable/*.json" | sed 's/EUR\.json//')
+	local availlable=$(ls ../etc/config.d/availlable/*.json | sed 's/EUR\.json//')
 	local enable=$(enabled_crypto)
 	for i in $enable
 	do
@@ -176,7 +176,7 @@ del_quest() {
         local BUTTONS=""
 
         local count=0
-        local list=$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')
+        local list=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 
         for l in $list
         do
@@ -221,7 +221,7 @@ start_quest() {
 	local ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled") $CANCEL)
 
         local count=0
-        local list=$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')
+        local list=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 
         for l in $list
         do
@@ -273,7 +273,7 @@ start_answer() {
 }
 
 start_all() {
-       	local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
+       	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
 	if [ -n "$enabled" ]
 	then
 		for i in $enabled
@@ -297,7 +297,7 @@ stop_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-        local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')
+        local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 
         for l in $enabled
         do
@@ -350,7 +350,7 @@ stop_answer() {
 
 stop_all() {
 
-	local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
+	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
 	for i in $enabled
 	do
 		if [ "$(./trade.sh status $i)" ]
@@ -372,7 +372,7 @@ restart_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-        local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')
+        local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 
         for l in $enabled
         do
@@ -426,7 +426,7 @@ restart_answer() {
                 local TEXT="Restart all enabled bot."
                 change_last_msg "$TEXT"
 
-                local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
+                local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
                 for i in $enabled
                 do
                         if [ "$(./trade.sh status $i)" ]
@@ -481,7 +481,7 @@ get_answer() {
 }
 
 get_status() {
-        local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
+        local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
 
         for l in $enabled
         do
@@ -498,7 +498,7 @@ get_status() {
 }
 
 get_margin() {
-	local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
+	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
 	
 	for l in $enabled
 	do
@@ -528,7 +528,7 @@ balance() {
 }
 
 get_trades() {
-	JSON="../logs/telegrambot/telegram_data/data.json"
+	JSON="../logs/telegrambot/telegram_data/data.json
 	jq -r '.trades | keys' $JSON | sed -e '/\[/d' -e '/\]/d' -e 's/^  //' -e 's/\,//' | while read DATE
 	do
 		local PAIR=$(jq -r ".trades.$DATE | .pair" $JSON)
