@@ -102,18 +102,18 @@ new_quest() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
 	fi
-	local availlable=$(ls ../etc/config.d/availlable/*.json | sed 's/EUR\.json//')
+	local availlable=$(ls ../etc/config.d/availlable/ | grep ".json" | sed 's/EUR\.json//')
 	for i in $enabled
 	do
 		local availlable=$(echo $availlable | sed "s/$i //")
 	done
 
-	for l in $list
+	for l in $availlable
 	do
 		local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
 		((count+=1))
@@ -158,7 +158,7 @@ del_quest() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
@@ -210,7 +210,7 @@ start_quest() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
@@ -269,7 +269,7 @@ start_all() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
@@ -300,7 +300,7 @@ stop_quest() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
@@ -359,7 +359,7 @@ stop_all() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
@@ -388,7 +388,7 @@ restart_quest() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
@@ -449,7 +449,7 @@ restart_answer() {
 		local files=(../etc/config.d/enabled/*.json)
 		if [ -e "${files[0]}" ]
 		then
-       		 	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+       		 	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 		else
 			local TEXT="No bot enabled"
 			send_msg "$TEXT"
@@ -511,7 +511,7 @@ get_status() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
@@ -535,7 +535,7 @@ get_margin() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
 	else
 		local TEXT="No bot enabled."
 		send_msg "$TEXT"
