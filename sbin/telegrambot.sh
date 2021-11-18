@@ -125,7 +125,7 @@ bot_unstarted() {
 	local unstarted="$(bot_enabled)"
 	for i in $started
 	do
-		unstarted="$(echo $unstarted | grep -v "$i")
+		unstarted="$(echo $unstarted | grep -v "$i")"
 	done
 }
 
