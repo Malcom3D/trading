@@ -12,6 +12,7 @@ MENU_URL="$BASE_URL/setMyCommands"
 
 # Common options
 CANCEL=$(jo text="Cancel" callback_data="cancel")
+ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled"))
 CONTENT="Content-Type: application/json"
 
 
@@ -99,14 +100,11 @@ json_enabled() {
 	if [ -e "${files[0]}" ]
 	then
         	echo $(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
-	else
-		local TEXT="No bot enabled"
-		send_msg "$TEXT"
 	fi
 }
 
 put_in_row() {
-	local ROW=""
+	ROW=""
 	local BUTTONS=""
 	local count=0
 	for l in $1
@@ -116,61 +114,36 @@ put_in_row() {
 
 		if [ "$count" -eq 4 ] && [ -z "$ROW" ]
 		then
-			local ROW="$(jo -a $BUTTONS)"
+			ROW="$(jo -a $BUTTONS)"
 			local BUTTONS=""
 			local count=0
 		elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
 		then
-			local ROW="$ROW $(jo -a $BUTTONS)"
+			ROW="$ROW $(jo -a $BUTTONS)"
 			local BUTTONS=""
 			local count=0
 		fi
 	done
-	local ROW="$(jo -a $CANCEL) $ROW"
-	echo $ROW
+	if [ -n "$BUTTONS" ]
+	then
+		ROW="$ROW $(jo -a $BUTTONS)"
+	fi
+	ROW="$(jo -a $CANCEL) $ROW"
 }
 
 new_quest() {
-#	local ROW=""
-#	local BUTTONS=""
-#	local count=0
-
-#	local files=(../etc/config.d/enabled/*.json)
-#	if [ -e "${files[0]}" ]
-#	then
-#        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
-#	else
-#		local TEXT="No bot enabled"
-#		send_msg "$TEXT"
-#	fi
-	local enabled=$(json_enabled)
+	local enabled="$(json_enabled)"
 	local availlable=$(ls ../etc/config.d/availlable/ | grep ".json" | sed 's/EUR\.json//')
-	for i in $enabled
-	do
-		local availlable=$(echo $availlable | sed "s/$i //")
-	done
+	if [ -n "$enabled" ]
+	then
+		for i in $enabled
+		do
+			local availlable=$(echo $availlable | sed "s/$i //")
+		done
+	fi
 
-#	for l in $availlable
-#	do
-#		local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
-#		((count+=1))
-#
-#		if [ "$count" -eq 4 ] && [ -z "$ROW" ]
-#		then
-#			local ROW="$(jo -a $BUTTONS)"
-#			local BUTTONS=""
-#			local count=0
-#		elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
-#		then
-#			local ROW="$ROW $(jo -a $BUTTONS)"
-#			local BUTTONS=""
-#			local count=0
-#		fi
-#	done
-#	local ROW="$(jo -a $CANCEL) $ROW"
-	local $ROW=$(put_in_row $availlable)
-	log "new_quest: ROW=$ROW"
-	ROW="$(jo -a $CANCEL) $ROW"
+	local ROW=""
+	put_in_row "$availlable"
 	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
 
@@ -191,37 +164,9 @@ new_answer() {
 }
 
 del_quest() {
-        local ROW=""
-        local BUTTONS=""
-
-        local count=0
-	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
-	then
-        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
-	else
-		local TEXT="No bot enabled"
-		send_msg "$TEXT"
-	fi
-
-        for l in $enabled
-        do
-                local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
-                ((count+=1))
-
-                if [ "$count" -eq 4 ] && [ -z "$ROW" ]
-                then
-                        local ROW="$(jo -a $BUTTONS)"
-                        local BUTTONS=""
-                        local count=0
-                elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
-                then
-                        local ROW="$ROW $(jo -a $BUTTONS)"
-                        local BUTTONS=""
-                        local count=0
-                fi
-        done
-        local ROW="$(jo -a $CANCEL) $ROW"
+	local enabled="$(json_enabled)"
+	local ROW=""
+	put_in_row "$enabled"
         send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
 
@@ -242,44 +187,9 @@ del_answer() {
 }
 
 start_quest() {
-        local ROW=""
-        local BUTTONS=""
-	local ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled") $CANCEL)
-
-        local count=0
-	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
-	then
-        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
-	else
-		local TEXT="No bot enabled"
-		send_msg "$TEXT"
-	fi
-
-        for l in $enabled
-        do
-		if ! [ "$(./trade.sh status "$l"EUR)" ]
-		then
-	                local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
-	                ((count+=1))
-
-	                if [ "$count" -eq 4 ] && [ -z "$ROW" ]
-	                then
-	                        local ROW="$(jo -a $BUTTONS)"
-	                        local BUTTONS=""
-	                        local count=0
-	                elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
-	                then
-	                        local ROW="$ROW $(jo -a $BUTTONS)"
-	                        local BUTTONS=""
-	                        local count=0
-	                fi
-		fi
-        done
-	if [ -n "$BUTTONS" ]
-	then
-		local ROW="$ROW $(jo -a $BUTTONS)"
-	fi
+	local enabled="$(json_enabled)"
+	local ROW=""
+	put_in_row "$enabled"
         local ROW="$ALL_ENABLED $ROW"
         send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
@@ -306,14 +216,7 @@ start_answer() {
 }
 
 start_all() {
-	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
-	then
-        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
-	else
-		local TEXT="No bot enabled"
-		send_msg "$TEXT"
-	fi
+	local enabled="$(json_enabled)"
 	if [ -n "$enabled" ]
 	then
 		for i in $enabled
@@ -332,44 +235,17 @@ start_all() {
 }
 
 stop_quest() {
-        local ROW=""
-        local BUTTONS=""
-        local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
-
-        local count=0
-	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
-	then
-        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
-	else
-		local TEXT="No bot enabled"
-		send_msg "$TEXT"
-	fi
-
-        for l in $enabled
-        do
+	local started=""
+	local enabled="$(json_enabled)"
+	for i in "$enabled"
+	do
 		if [ "$(./trade.sh status "$l"EUR)" ]
 		then
-	                local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
-	                ((count+=1))
-
-	                if [ "$count" -eq 4 ] && [ -z "$ROW" ]
-	                then
-	                        local ROW="$(jo -a $BUTTONS)"
-	                        local BUTTONS=""
-	                        local count=0
-	                elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
-	                then
-	                        local ROW="$ROW $(jo -a $BUTTONS)"
-	                        local BUTTONS=""
-	                        local count=0
-	                fi
+			local started="$started $i"
 		fi
-        done
-	if [ -n "$BUTTONS" ]
-	then
-		local ROW="$ROW $(jo -a $BUTTONS)"
-	fi
+	done
+	local ROW=""
+	put_in_row "$started"
        	local ROW="$ALL_STARTED $ROW"
        	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto bot to stop" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
@@ -396,14 +272,7 @@ stop_answer() {
 }
 
 stop_all() {
-	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
-	then
-        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
-	else
-		local TEXT="No bot enabled"
-		send_msg "$TEXT"
-	fi
+	local enabled="$(json_enabled)"
 	for i in $enabled
 	do
 		if [ "$(./trade.sh status "$i"EUR)" ]
@@ -420,49 +289,22 @@ stop_all() {
 }
 
 restart_quest() {
-        local ROW=""
-        local BUTTONS=""
-        local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
-
-        local count=0
-	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
-	then
-        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
-	else
-		local TEXT="No bot enabled"
-		send_msg "$TEXT"
-	fi
-
-        for l in $enabled
-        do
-                if [ "$(./trade.sh status "$l"EUR)" ]
-                then
-                        local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
-                        ((count+=1))
-
-                        if [ "$count" -eq 4 ] && [ -z "$ROW" ]
-                        then
-                                local ROW="$(jo -a $BUTTONS)"
-                                local BUTTONS=""
-                                local count=0
-                        elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
-                        then
-                                local ROW="$ROW $(jo -a $BUTTONS)"
-                                local BUTTONS=""
-                                local count=0
-                        fi
-                fi
-        done
-	if [ -n "$BUTTONS" ]
-	then
-		local ROW="$ROW $(jo -a $BUTTONS)"
-	fi
-	if [ -z "$ROW" ] && [ -z "$BUTTONS" ]
+	local started=""
+	local enabled="$(json_enabled)"
+	for i in "$enabled"
+	do
+		if [ "$(./trade.sh status "$l"EUR)" ]
+		then
+			local started="$started $i"
+		fi
+	done
+	if [ -z "$started" ]
 	then
 		local TEXT="No running bot."
 		send_msg "$TEXT"
 	else
+		local ROW=""
+		put_in_row "$started"
        		local ROW="$ALL_STARTED $ROW"
        		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto bot to restart" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 	fi
@@ -485,28 +327,8 @@ restart_answer() {
         then
                 local TEXT="Restart all enabled bot."
                 change_last_msg "$TEXT"
-
-		local files=(../etc/config.d/enabled/*.json)
-		if [ -e "${files[0]}" ]
-		then
-       		 	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
-		else
-			local TEXT="No bot enabled"
-			send_msg "$TEXT"
-		fi
-                for i in $enabled
-                do
-                        if [ "$(./trade.sh status "$i"EUR)" ]
-                        then
-                                if [ "$(./trade.sh restart "$i"EUR)" ]
-                                then
-                                        local TEXT="$i bot restarted."
-                                else
-                                        local TEXT="WARNING: error restarting $i bot."
-                                fi
-                                send_msg "$TEXT"
-                        fi
-                done
+		stop_all
+		start_all
         fi
 }
 
@@ -548,52 +370,41 @@ get_answer() {
 }
 
 get_status() {
-	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
+	local enabled="$(json_enabled)"
+	if [ -n "$enabled" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
+	        for l in $enabled
+	        do
+	                if [ "$(./trade.sh status "$l"EUR)" ]
+	                then
+				local TEXT=$(echo "$TEXT" && echo "$l bot is running")
+			else
+				local TEXT=$(echo "$TEXT" && echo "$l bot is not running")
+			fi
+		done
 	else
-		local TEXT="No bot enabled"
-		send_msg "$TEXT"
-	fi
-
-        for l in $enabled
-        do
-                if [ "$(./trade.sh status "$l"EUR)" ]
-                then
-			local TEXT=$(echo "$TEXT" && echo "$l bot is running")
-		fi
-	done
-	if [ -z "$TEXT" ]
-	then
-		local TEXT="No running bot."
+		local TEXT="No bot enabled."
 	fi
 	send_msg "$TEXT"
 }
 
 get_margin() {
 	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
+	local enabled="$(json_enabled)"
+	if [ -n "$enabled" ]
 	then
-        	local enabled=$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
+		for l in $enabled
+		do
+			if [ "$(./trade.sh status "$l"EUR)" ]
+			then
+				local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
+				local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
+				local margin=$(echo $info | grep "Margin" | cut -d"|" -f5 | cut -d":" -f2)
+				local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
+				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price€" && echo " - Margin: $margin" && echo " - (P/L): $profit€" && echo)
+			fi
+		done
 	else
-		local TEXT="No bot enabled."
-		send_msg "$TEXT"
-	fi
-	
-	for l in $enabled
-	do
-		if [ "$(./trade.sh status "$l"EUR)" ]
-		then
-			local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
-			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
-			local margin=$(echo $info | grep "Margin" | cut -d"|" -f5 | cut -d":" -f2)
-			local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
-			local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price€" && echo " - Margin: $margin" && echo " - (P/L): $profit€" && echo)
-		fi
-	done
-	if [ -z "$TEXT" ]
-	then
 		local TEXT="No runninig bot."
 	fi
 	send_msg "$TEXT"
