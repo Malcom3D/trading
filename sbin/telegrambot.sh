@@ -418,7 +418,6 @@ get_status() {
 }
 
 get_margin() {
-	local files=(../etc/config.d/enabled/*.json)
 	local started="$(bot_started)"
 	if [ -n "$started" ]
 	then
@@ -428,10 +427,17 @@ get_margin() {
 			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
 			local margin=$(echo $info | grep "Margin" | cut -d"|" -f5 | cut -d":" -f2)
 			local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
-			local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price€" && echo " - Margin: $margin" && echo " - (P/L): $profit€" && echo)
+			if [ -n "$price" ] && [ -n "$margin" ] && [ -n "$profit" ]
+			then
+				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price€" && echo " - Margin: $margin" && echo " - (P/L): $profit€" && echo)
+			fi
 		done
+		if [ -z "$TEXT" ]
+		then
+			TEXT="No trade for running bot"
+		fi
 	else
-		local TEXT="No runninig bot."
+		local TEXT="No running bot."
 	fi
 	send_msg "$TEXT"
 }
