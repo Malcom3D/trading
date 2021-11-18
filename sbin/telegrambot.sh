@@ -99,7 +99,8 @@ new_quest() {
 	local BUTTONS=""
 	local count=0
 
-	if [ -e ../etc/config.d/enabled/*.json ]
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
 	then
         	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 	else
@@ -154,7 +155,8 @@ del_quest() {
         local BUTTONS=""
 
         local count=0
-	if [ -e ../etc/config.d/enabled/*.json ]
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
 	then
         	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 	else
@@ -205,7 +207,8 @@ start_quest() {
 	local ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled") $CANCEL)
 
         local count=0
-	if [ -e ../etc/config.d/enabled/*.json ]
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
 	then
         	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 	else
@@ -263,7 +266,8 @@ start_answer() {
 }
 
 start_all() {
-	if [ -e ../etc/config.d/enabled/*.json ]
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
 	then
         	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 	else
@@ -293,7 +297,8 @@ stop_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-	if [ -e ../etc/config.d/enabled/*.json ]
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
 	then
         	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 	else
@@ -351,8 +356,8 @@ stop_answer() {
 }
 
 stop_all() {
-
-	if [ -e ../etc/config.d/enabled/*.json ]
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
 	then
         	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 	else
@@ -380,7 +385,8 @@ restart_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-	if [ -e ../etc/config.d/enabled/*.json ]
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
 	then
         	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 	else
@@ -440,7 +446,8 @@ restart_answer() {
                 local TEXT="Restart all enabled bot."
                 change_last_msg "$TEXT"
 
-		if [ -e ../etc/config.d/enabled/*.json ]
+		local files=(../etc/config.d/enabled/*.json)
+		if [ -e "${files[0]}" ]
 		then
        		 	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 		else
@@ -501,7 +508,8 @@ get_answer() {
 }
 
 get_status() {
-	if [ -e ../etc/config.d/enabled/*.json ]
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
 	then
         	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 	else
@@ -524,7 +532,8 @@ get_status() {
 }
 
 get_margin() {
-	if [ -e ../etc/config.d/enabled/*.json ]
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
 	then
         	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
 	else
