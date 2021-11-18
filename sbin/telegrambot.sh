@@ -115,7 +115,7 @@ bot_enabled() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	echo "$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')"
+        	echo "$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')"
 	fi
 }
 
@@ -149,7 +149,7 @@ put_in_row() {
 
 new_quest() {
 	local enabled="$(bot_enabled)"
-	local availlable=$(ls ../etc/config.d/availlable/ | grep ".json" | sed 's/EUR\.json//')
+	local availlable=$(ls ../etc/config.d/availlable/ | grep "\.json" | sed 's/EUR\.json//')
 	if [ -n "$enabled" ]
 	then
 		for i in $enabled
