@@ -1,0 +1,2 @@
+Cmnd_Alias	TRADER = /sbin/poweroff, /sbin/reboot, /sbin/systemctl restart trading
+trader ALL = NOPASSWD: TRADER

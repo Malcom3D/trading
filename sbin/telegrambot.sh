@@ -93,35 +93,65 @@ update_msg() {
         done
 }
 
-new_quest() {
-	local ROW=""
-	local BUTTONS=""
+enabled_crypto(){
+	echo "$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')"
+}
 
-	local count=0
-	local list=$(ls ../etc/config.d/availlable | grep "\.json" | sed 's/EUR\.json//')
-	for i in $(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
-	do
-		local list=$(echo $list | sed "s/$i //")
-	done
-
+put_in_row(){
+	local list=$1
 	for l in $list
 	do
 		local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
 		((count+=1))
 
-		if [ "$count" -eq 3 ] && [ -z "$ROW" ]
+		if [ "$count" -eq 4 ] && [ -z "$ROW" ]
 		then
 			local ROW="$(jo -a $BUTTONS)"
 			local BUTTONS=""
 			local count=0
-		elif [ "$count" -eq 3 ] && [ -n "$ROW" ]
+		elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
 		then
 			local ROW="$ROW $(jo -a $BUTTONS)"
 			local BUTTONS=""
 			local count=0
 		fi
 	done
-	local ROW="$(jo -a $CANCEL) $ROW"
+	echo $ROW
+}
+
+new_quest() {
+	local ROW=""
+	local BUTTONS=""
+
+	local count=0
+	local availlable=$(ls ../etc/config.d/availlable/*.json" | sed 's/EUR\.json//')
+	local enable=$(enabled_crypto)
+	for i in $enable
+	do
+		local availlable=$(echo $availlable | sed "s/$i //")
+	done
+
+#	for l in $list
+#	do
+#		local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
+#		((count+=1))
+#
+#		if [ "$count" -eq 4 ] && [ -z "$ROW" ]
+#		then
+#			local ROW="$(jo -a $BUTTONS)"
+#			local BUTTONS=""
+#			local count=0
+#		elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
+#		then
+#			local ROW="$ROW $(jo -a $BUTTONS)"
+#			local BUTTONS=""
+#			local count=0
+#		fi
+#	done
+#	local ROW="$(jo -a $CANCEL) $ROW"
+#	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+
+	local ROW="$(jo -a $CANCEL) $(put_in_row $list)"
 	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
 
@@ -146,19 +176,19 @@ del_quest() {
         local BUTTONS=""
 
         local count=0
-        local list=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
+        local list=$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')
 
         for l in $list
         do
                 local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
                 ((count+=1))
 
-                if [ "$count" -eq 3 ] && [ -z "$ROW" ]
+                if [ "$count" -eq 4 ] && [ -z "$ROW" ]
                 then
                         local ROW="$(jo -a $BUTTONS)"
                         local BUTTONS=""
                         local count=0
-                elif [ "$count" -eq 3 ] && [ -n "$ROW" ]
+                elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
                 then
                         local ROW="$ROW $(jo -a $BUTTONS)"
                         local BUTTONS=""
@@ -191,7 +221,7 @@ start_quest() {
 	local ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled") $CANCEL)
 
         local count=0
-        local list=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
+        local list=$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')
 
         for l in $list
         do
@@ -200,12 +230,12 @@ start_quest() {
 	                local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
 	                ((count+=1))
 
-	                if [ "$count" -eq 3 ] && [ -z "$ROW" ]
+	                if [ "$count" -eq 4 ] && [ -z "$ROW" ]
 	                then
 	                        local ROW="$(jo -a $BUTTONS)"
 	                        local BUTTONS=""
 	                        local count=0
-	                elif [ "$count" -eq 3 ] && [ -n "$ROW" ]
+	                elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
 	                then
 	                        local ROW="$ROW $(jo -a $BUTTONS)"
 	                        local BUTTONS=""
@@ -243,7 +273,7 @@ start_answer() {
 }
 
 start_all() {
-       	local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
+       	local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
 	if [ -n "$enabled" ]
 	then
 		for i in $enabled
@@ -267,7 +297,7 @@ stop_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-        local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
+        local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')
 
         for l in $enabled
         do
@@ -276,12 +306,12 @@ stop_quest() {
 	                local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
 	                ((count+=1))
 
-	                if [ "$count" -eq 3 ] && [ -z "$ROW" ]
+	                if [ "$count" -eq 4 ] && [ -z "$ROW" ]
 	                then
 	                        local ROW="$(jo -a $BUTTONS)"
 	                        local BUTTONS=""
 	                        local count=0
-	                elif [ "$count" -eq 3 ] && [ -n "$ROW" ]
+	                elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
 	                then
 	                        local ROW="$ROW $(jo -a $BUTTONS)"
 	                        local BUTTONS=""
@@ -320,7 +350,7 @@ stop_answer() {
 
 stop_all() {
 
-	local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
+	local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
 	for i in $enabled
 	do
 		if [ "$(./trade.sh status $i)" ]
@@ -342,7 +372,7 @@ restart_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-        local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')
+        local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/EUR\.json//')
 
         for l in $enabled
         do
@@ -351,12 +381,12 @@ restart_quest() {
                         local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
                         ((count+=1))
 
-                        if [ "$count" -eq 3 ] && [ -z "$ROW" ]
+                        if [ "$count" -eq 4 ] && [ -z "$ROW" ]
                         then
                                 local ROW="$(jo -a $BUTTONS)"
                                 local BUTTONS=""
                                 local count=0
-                        elif [ "$count" -eq 3 ] && [ -n "$ROW" ]
+                        elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
                         then
                                 local ROW="$ROW $(jo -a $BUTTONS)"
                                 local BUTTONS=""
@@ -396,7 +426,7 @@ restart_answer() {
                 local TEXT="Restart all enabled bot."
                 change_last_msg "$TEXT"
 
-                local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
+                local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
                 for i in $enabled
                 do
                         if [ "$(./trade.sh status $i)" ]
@@ -451,7 +481,7 @@ get_answer() {
 }
 
 get_status() {
-        local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
+        local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
 
         for l in $enabled
         do
@@ -468,7 +498,7 @@ get_status() {
 }
 
 get_margin() {
-	local enabled=$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')
+	local enabled=$(ls ../etc/config.d/enabled/*.json" | sed 's/\.json//')
 	
 	for l in $enabled
 	do
