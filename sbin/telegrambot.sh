@@ -122,11 +122,14 @@ bot_started() {
 
 bot_unstarted() {
 	local started="$(bot_started)"
+	log "DEBUG: log_unstarted: started: $started"
 	local unstarted="$(bot_enabled)"
+	log "DEBUG: log_unstarted: unstarted: $unstarted"
 	for i in $started
 	do
 		unstarted="$(echo $unstarted | grep -v "$i")"
 	done
+	log "DEBUG: log_unstarted: unstarted: $unstarted"
 }
 
 put_in_row() {
