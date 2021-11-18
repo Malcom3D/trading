@@ -19,7 +19,7 @@ init_TelegramBot() {
 
 init_git() {
 	cd $DirName/../
-	if [ $(git pull --recurse-submodules &>/dev/null) ]
+	if [ $(git pull &>/dev/null) ]
 	then
 		git submodule update --remote --merge &>/dev/null
 		cd $DirName/../lib/cryptobot
