@@ -95,6 +95,14 @@ update_msg() {
         done
 }
 
+bot_enabled() {
+	local files=(../etc/config.d/enabled/*.json)
+	if [ -e "${files[0]}" ]
+	then
+        	echo "$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')"
+	fi
+}
+
 bot_started() {
 	local started=""
 	local enabled="$(bot_enabled)"
@@ -111,12 +119,13 @@ bot_started() {
 	echo "$started"
 }
 
-bot_enabled() {
-	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
-	then
-        	echo "$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')"
-	fi
+bot_unstarted() {
+	local started="$(bot_started)"
+	local unstarted="$(bot_enabled)"
+	for i in $started
+	do
+		unstarted="$(echo $unstarted | grep -v "$i")
+	done
 }
 
 put_in_row() {
@@ -217,17 +226,12 @@ del_answer() {
 }
 
 start_quest() {
-	local enabled="$(bot_enabled)"
-	local started="$(bot_started)"
-	for i in $started
-	do
-		local enabled=$(echo "$enabled" | sed 's/$i//')
-	done
-	log "DEBUG: non started: $enabled"
-	if [ -n "$enabled" ]
+	local unstarted="$(bot_unstarted)"
+	log "DEBUG: non started: $unstarted"
+	if [ -n "$unstarted" ]
 	then
 		local ROW=""
-		put_in_row "$enabled"
+		put_in_row "$unstarted"
 		local ROW="$ALL_ENABLED $ROW"
 		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 		start_answer
@@ -259,15 +263,10 @@ start_answer() {
 }
 
 start_all() {
-	local enabled="$(bot_enabled)"
-	local started="$(bot_started)"
-	for i in "$started"
-	do
-		local enabled=$(echo $enabled | sed 's/$i//')
-	done
-	if [ -n "$enabled" ]
+	local unstarted="$(bot_unstarted)"
+	if [ -n "$unstarted" ]
 	then
-		for i in $enabled
+		for i in $unstarted
 		do
 			if [ "$(./trade.sh start "$i"EUR)" ]
 			then
@@ -319,21 +318,18 @@ stop_answer() {
 }
 
 stop_all() {
-	local enabled="$(bot_enabled)"
-	if [ -n "$enabled" ]
+	local started="$(bot_started)"
+	if [ -n "$started" ]
 	then
-		for i in $enabled
+		for i in $started
 		do
-			if [ "$(./trade.sh status "$i"EUR)" ]
+			if [ "$(./trade.sh stop "$i"EUR)" ]
 			then
-	                       	if [ "$(./trade.sh stop "$i"EUR)" ]
-				then
-					local TEXT="$i bot stopped."
-				else
-					local TEXT="WARNING: error stopping $i bot stopped."
-				fi
-	                       	send_msg "$TEXT"
+				local TEXT="$i bot stopped."
+			else
+				local TEXT="WARNING: error stopping $i bot stopped."
 			fi
+			send_msg "$TEXT"
 		done
 	else
 		local TEXT="No running bot."
