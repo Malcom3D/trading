@@ -19,12 +19,12 @@ init_TelegramBot() {
 
 init_git() {
 	cd $DirName/../
-	if [ $(git pull &>/dev/null) ]
+	if [ $(git pull > /dev/null 2>&1) ]
 	then
-		git submodule update --remote --merge &>/dev/null
+		git submodule update --remote --merge > /dev/null 2>&1
 		cd $DirName/../lib/cryptobot
 		source ../bin/activate
-		python -m pip install -r requirements.txt -U &>/dev/null
+		python -m pip install -r requirements.txt -U > /dev/null 2>&1
 	fi
 }
 
@@ -38,7 +38,7 @@ init() {
 	init_git
 	while true
 	do
-		screen -wipe &>/dev/null
+		screen -wipe > /dev/null 2>&1
 		for i in ipCheck TelegramBot
 		do
 			if ! [ "$(screen -ls | grep $i)" ]

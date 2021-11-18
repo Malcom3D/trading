@@ -102,11 +102,9 @@ bot_started() {
 	then
 		for i in "$enabled"
 		do
-			log "DEBUG: bot_started: status $i"
-			if [ "$(./trade.sh status "$i"EUR)" ]
+			if [ "$(./trade.sh status "$i"EUR > /dev/null 2>&1)" ]
 			then
 				local started="$started $i"
-				log "DEBUG: bot_started: $i started"
 			fi
 		done
 	fi

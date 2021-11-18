@@ -17,7 +17,7 @@ start() {
 		screen -dmS $MARKET $DirName/../sbin/$ScriptName trade $MARKET
 		echo $?
 	fi
-	cd - &>/dev/null
+	cd - > /dev/null 2>&1
 }
 
 trade() {
@@ -41,7 +41,7 @@ enable() {
 	cd $ENABLED
 	ln -s ../availlable/$MARKET.json
 	echo $?
-	cd - &>/dev/null
+	cd - > /dev/null 2>&1
 }
 
 disable() {
@@ -103,8 +103,8 @@ merge_config() {
 
 init_git() {
         cd $DirName/../
-        git pull &>/dev/null
-	git submodule update --remote --merge &>/dev/null
+        git pull > /dev/null 2>&1
+	git submodule update --remote --merge > /dev/null 2>&1
 }
 
 # Check passed argument
