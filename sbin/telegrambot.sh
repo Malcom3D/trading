@@ -126,6 +126,7 @@ put_in_row() {
 			local count=0
 		fi
 	done
+	local ROW="$(jo -a $CANCEL) $ROW"
 	echo $ROW
 }
 
@@ -148,7 +149,6 @@ new_quest() {
 	do
 		local availlable=$(echo $availlable | sed "s/$i //")
 	done
-	log "$availlable"
 
 #	for l in $availlable
 #	do
@@ -168,9 +168,9 @@ new_quest() {
 #		fi
 #	done
 #	local ROW="$(jo -a $CANCEL) $ROW"
-	local in_row="$(put_in_row $availlable)"
-	log "$in_row"
-	ROW="$(jo -a $CANCEL) $in_row"
+	local $ROW=$(put_in_row $availlable)
+	log "new_quest: ROW=$ROW"
+	ROW="$(jo -a $CANCEL) $ROW"
 	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
 
