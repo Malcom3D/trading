@@ -98,13 +98,16 @@ update_msg() {
 bot_started() {
 	local started=""
 	local enabled="$(bot_enabled)"
-	for i in "$enabled"
-	do
-		if [ "$(./trade.sh status "$l"EUR)" ]
-		then
-			local started="$started $i"
-		fi
-	done
+	if [ -n "$enabled" ]
+	then
+		for i in "$enabled"
+		do
+			if [ "$(./trade.sh status "$i"EUR)" ]
+			then
+				local started="$started $i"
+			fi
+		done
+	fi
 	echo "$started"
 }
 
