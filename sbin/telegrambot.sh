@@ -12,7 +12,8 @@ MENU_URL="$BASE_URL/setMyCommands"
 
 # Common options
 CANCEL=$(jo text="Cancel" callback_data="cancel")
-CONTENT="Content-Type: application/json
+CONTENT="Content-Type: application/json"
+
 
 # logger funtion
 log() {
@@ -93,12 +94,24 @@ update_msg() {
         done
 }
 
-enabled_crypto(){
-	echo "$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')"
-}
+new_quest() {
+	local ROW=""
+	local BUTTONS=""
+	local count=0
 
-put_in_row(){
-	local list=$1
+	if [ -e ../etc/config.d/enabled/*.json ]
+	then
+        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
+	local availlable=$(ls ../etc/config.d/availlable/*.json | sed 's/EUR\.json//')
+	for i in $enabled
+	do
+		local availlable=$(echo $availlable | sed "s/$i //")
+	done
+
 	for l in $list
 	do
 		local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
@@ -116,42 +129,7 @@ put_in_row(){
 			local count=0
 		fi
 	done
-	echo $ROW
-}
-
-new_quest() {
-	local ROW=""
-	local BUTTONS=""
-
-	local count=0
-	local availlable=$(ls ../etc/config.d/availlable/*.json | sed 's/EUR\.json//')
-	local enable=$(enabled_crypto)
-	for i in $enable
-	do
-		local availlable=$(echo $availlable | sed "s/$i //")
-	done
-
-#	for l in $list
-#	do
-#		local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
-#		((count+=1))
-#
-#		if [ "$count" -eq 4 ] && [ -z "$ROW" ]
-#		then
-#			local ROW="$(jo -a $BUTTONS)"
-#			local BUTTONS=""
-#			local count=0
-#		elif [ "$count" -eq 4 ] && [ -n "$ROW" ]
-#		then
-#			local ROW="$ROW $(jo -a $BUTTONS)"
-#			local BUTTONS=""
-#			local count=0
-#		fi
-#	done
-#	local ROW="$(jo -a $CANCEL) $ROW"
-#	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-
-	local ROW="$(jo -a $CANCEL) $(put_in_row $list)"
+	local ROW="$(jo -a $CANCEL) $ROW"
 	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 }
 
@@ -176,9 +154,15 @@ del_quest() {
         local BUTTONS=""
 
         local count=0
-        local list=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	if [ -e ../etc/config.d/enabled/*.json ]
+	then
+        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
 
-        for l in $list
+        for l in $enabled
         do
                 local BUTTONS="$BUTTONS $(jo text="$l" callback_data="$l")"
                 ((count+=1))
@@ -221,9 +205,15 @@ start_quest() {
 	local ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled") $CANCEL)
 
         local count=0
-        local list=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	if [ -e ../etc/config.d/enabled/*.json ]
+	then
+        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
 
-        for l in $list
+        for l in $enabled
         do
 		if ! [ "$(./trade.sh status "$l"EUR)" ]
 		then
@@ -273,12 +263,18 @@ start_answer() {
 }
 
 start_all() {
-       	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
+	if [ -e ../etc/config.d/enabled/*.json ]
+	then
+        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
 	if [ -n "$enabled" ]
 	then
 		for i in $enabled
 		do
-			if [ "$(./trade.sh start $i)" ]
+			if [ "$(./trade.sh start "$i"EUR)" ]
 			then
 		                local TEXT="$i bot started."
 			else
@@ -297,7 +293,13 @@ stop_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-        local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	if [ -e ../etc/config.d/enabled/*.json ]
+	then
+        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
 
         for l in $enabled
         do
@@ -350,12 +352,18 @@ stop_answer() {
 
 stop_all() {
 
-	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
+	if [ -e ../etc/config.d/enabled/*.json ]
+	then
+        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
 	for i in $enabled
 	do
-		if [ "$(./trade.sh status $i)" ]
+		if [ "$(./trade.sh status "$i"EUR)" ]
 		then
-                       	if [ "$(./trade.sh stop $i)" ]
+                       	if [ "$(./trade.sh stop "$i"EUR)" ]
 			then
 				local TEXT="$i bot stopped."
 			else
@@ -372,7 +380,13 @@ restart_quest() {
         local ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started") $CANCEL)
 
         local count=0
-        local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	if [ -e ../etc/config.d/enabled/*.json ]
+	then
+        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
 
         for l in $enabled
         do
@@ -426,12 +440,18 @@ restart_answer() {
                 local TEXT="Restart all enabled bot."
                 change_last_msg "$TEXT"
 
-                local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
+		if [ -e ../etc/config.d/enabled/*.json ]
+		then
+       		 	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+		else
+			local TEXT="No bot enabled"
+			send_msg "$TEXT"
+		fi
                 for i in $enabled
                 do
-                        if [ "$(./trade.sh status $i)" ]
+                        if [ "$(./trade.sh status "$i"EUR)" ]
                         then
-                                if [ "$(./trade.sh restart $i)" ]
+                                if [ "$(./trade.sh restart "$i"EUR)" ]
                                 then
                                         local TEXT="$i bot restarted."
                                 else
@@ -481,11 +501,17 @@ get_answer() {
 }
 
 get_status() {
-        local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
+	if [ -e ../etc/config.d/enabled/*.json ]
+	then
+        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
 
         for l in $enabled
         do
-                if [ "$(./trade.sh status $l)" ]
+                if [ "$(./trade.sh status "$l"EUR)" ]
                 then
 			local TEXT=$(echo "$TEXT" && echo "$l bot is running")
 		fi
@@ -498,22 +524,23 @@ get_status() {
 }
 
 get_margin() {
-	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/\.json//')
+	if [ -e ../etc/config.d/enabled/*.json ]
+	then
+        	local enabled=$(ls ../etc/config.d/enabled/*.json | sed 's/EUR\.json//')
+	else
+		local TEXT="No bot enabled."
+		send_msg "$TEXT"
+	fi
 	
 	for l in $enabled
 	do
-		if [ "$(./trade.sh status $l)" ]
+		if [ "$(./trade.sh status "$l"EUR)" ]
 		then
 			local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
 			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
 			local margin=$(echo $info | grep "Margin" | cut -d"|" -f5 | cut -d":" -f2)
 			local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
-			if [ -n "$margin" ]
-			then
-				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price€" && echo " - Margin: $margin" && echo " - (P/L): $profit€" && echo)
-			else
-				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price" && echo)
-			fi
+			local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price€" && echo " - Margin: $margin" && echo " - (P/L): $profit€" && echo)
 		fi
 	done
 	if [ -z "$TEXT" ]
@@ -528,7 +555,7 @@ balance() {
 }
 
 get_trades() {
-	JSON="../logs/telegrambot/telegram_data/data.json
+	JSON="../logs/telegrambot/telegram_data/data.json"
 	jq -r '.trades | keys' $JSON | sed -e '/\[/d' -e '/\]/d' -e 's/^  //' -e 's/\,//' | while read DATE
 	do
 		local PAIR=$(jq -r ".trades.$DATE | .pair" $JSON)
@@ -540,8 +567,8 @@ get_trades() {
 }
 
 log "INFO: Starting..."
-send_msg "Starting all enabled bot..."
-start_all
+#send_msg "Starting all enabled bot..."
+#start_all
 
 # update menu list with commands
 log "DEBUG: Updating Menu"
