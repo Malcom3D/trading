@@ -125,7 +125,7 @@ bot_unstarted() {
 	local unstarted="$(bot_enabled)"
 	for i in $started
 	do
-		local unstarted="$(echo $unstarted | sed 's/$i//')"
+		local unstarted="$(echo $unstarted | sed "s/$i//")"
 		log "DEBUG: log_unstarted: started: $i  unstarted: $unstarted"
 	done
 	echo "$unstarted"
