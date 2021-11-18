@@ -97,7 +97,7 @@ status() {
 merge_config() {
 	local JSON=$(cat $ENABLED/$MARKET.json)
 	local JSON=$(echo $JSON | jq --arg api_key "$API_KEY" '. += {telegram: {"token" : $api_key}}')
-	local JSON=$(echo $JSON | jq --arg chat_id "$CHAT_ID" '.telegram += {"client_id" : $chat_id, "user_id" : $chat_id, "datafolder": "../telegrambot"}')
+	local JSON=$(echo $JSON | jq --arg chat_id "$CHAT_ID" '.telegram += {"client_id" : $chat_id, "user_id" : $chat_id, "datafolder": "../../logs/telegrambot"}')
 	echo $JSON > /tmp/$MARKET.json
 }
 
