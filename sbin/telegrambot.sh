@@ -219,6 +219,8 @@ del_answer() {
 start_quest() {
 	local enabled="$(bot_enabled)"
 	local started="$(bot_started)"
+	log "DEBUG: enabled: $enabled"
+	log "DEBUG: started: $started"
 	for i in $started
 	do
 		local enabled=$(echo $enabled | sed 's/$i//')
