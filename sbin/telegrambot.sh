@@ -95,11 +95,24 @@ update_msg() {
         done
 }
 
-json_enabled() {
+bot_started() {
+	local started=""
+	local enabled="$(bot_enabled)"
+	for i in "$enabled"
+	do
+		if [ "$(./trade.sh status "$l"EUR)" ]
+		then
+			local started="$started $i"
+		fi
+	done
+	echo "$started"
+}
+
+bot_enabled() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	echo $(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')
+        	echo "$(ls ../etc/config.d/enabled/ | grep ".json" | sed 's/EUR\.json//')"
 	fi
 }
 
@@ -132,7 +145,7 @@ put_in_row() {
 }
 
 new_quest() {
-	local enabled="$(json_enabled)"
+	local enabled="$(bot_enabled)"
 	local availlable=$(ls ../etc/config.d/availlable/ | grep ".json" | sed 's/EUR\.json//')
 	if [ -n "$enabled" ]
 	then
@@ -142,9 +155,16 @@ new_quest() {
 		done
 	fi
 
-	local ROW=""
-	put_in_row "$availlable"
-	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+	if [ -n "$availlable" ]
+	then
+		local ROW=""
+		put_in_row "$availlable"
+		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+		new_answer
+	else
+		local TEXT="All bot enabled"
+		send_msg "$TEXT"
+	fi
 }
 
 new_answer() {
@@ -164,10 +184,17 @@ new_answer() {
 }
 
 del_quest() {
-	local enabled="$(json_enabled)"
-	local ROW=""
-	put_in_row "$enabled"
-        send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+	local enabled="$(bot_enabled)"
+	if [ -n "$enabled" ]
+	then
+		local ROW=""
+		put_in_row "$enabled"
+	        send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+		del_answer
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
 }
 
 del_answer() {
@@ -187,11 +214,21 @@ del_answer() {
 }
 
 start_quest() {
-	local enabled="$(json_enabled)"
-	local ROW=""
-	put_in_row "$enabled"
-        local ROW="$ALL_ENABLED $ROW"
-        send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+	local enabled="$(bot_enabled)"
+	if [ -n "$enabled" ]
+	then
+		for i in "$enabled"
+		do
+			local ROW=""
+			put_in_row "$enabled"
+		        local ROW="$ALL_ENABLED $ROW"
+		        send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+			start_answer
+		done
+	else
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	fi
 }
 
 start_answer() {
@@ -216,7 +253,7 @@ start_answer() {
 }
 
 start_all() {
-	local enabled="$(json_enabled)"
+	local enabled="$(bot_enabled)"
 	if [ -n "$enabled" ]
 	then
 		for i in $enabled
@@ -235,19 +272,18 @@ start_all() {
 }
 
 stop_quest() {
-	local started=""
-	local enabled="$(json_enabled)"
-	for i in "$enabled"
-	do
-		if [ "$(./trade.sh status "$l"EUR)" ]
-		then
-			local started="$started $i"
-		fi
-	done
-	local ROW=""
-	put_in_row "$started"
-       	local ROW="$ALL_STARTED $ROW"
-       	send_quest "$(jo chat_id=$CHAT_ID text="Select crypto bot to stop" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+	started="$(bot_started)"
+	if [ -n "$started" ]
+	then
+		local ROW=""
+		put_in_row "$started"
+       		local ROW="$ALL_STARTED $ROW"
+       		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto bot to stop" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+		stop_answer
+	else
+		local TEXT="No running bot."
+		send_msg "$TEXT"
+	fi
 }
 
 stop_answer() {
@@ -272,7 +308,7 @@ stop_answer() {
 }
 
 stop_all() {
-	local enabled="$(json_enabled)"
+	local enabled="$(bot_enabled)"
 	for i in $enabled
 	do
 		if [ "$(./trade.sh status "$i"EUR)" ]
@@ -289,15 +325,7 @@ stop_all() {
 }
 
 restart_quest() {
-	local started=""
-	local enabled="$(json_enabled)"
-	for i in "$enabled"
-	do
-		if [ "$(./trade.sh status "$l"EUR)" ]
-		then
-			local started="$started $i"
-		fi
-	done
+	local started="$(bot_started)"
 	if [ -z "$started" ]
 	then
 		local TEXT="No running bot."
@@ -307,6 +335,7 @@ restart_quest() {
 		put_in_row "$started"
        		local ROW="$ALL_STARTED $ROW"
        		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto bot to restart" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+		restart_answer
 	fi
 }
 
@@ -370,7 +399,7 @@ get_answer() {
 }
 
 get_status() {
-	local enabled="$(json_enabled)"
+	local enabled="$(bot_enabled)"
 	if [ -n "$enabled" ]
 	then
 	        for l in $enabled
@@ -390,19 +419,16 @@ get_status() {
 
 get_margin() {
 	local files=(../etc/config.d/enabled/*.json)
-	local enabled="$(json_enabled)"
-	if [ -n "$enabled" ]
+	local started="$(bot_started)"
+	if [ -n "$started" ]
 	then
-		for l in $enabled
+		for l in $started
 		do
-			if [ "$(./trade.sh status "$l"EUR)" ]
-			then
-				local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
-				local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
-				local margin=$(echo $info | grep "Margin" | cut -d"|" -f5 | cut -d":" -f2)
-				local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
-				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price€" && echo " - Margin: $margin" && echo " - (P/L): $profit€" && echo)
-			fi
+			local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
+			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
+			local margin=$(echo $info | grep "Margin" | cut -d"|" -f5 | cut -d":" -f2)
+			local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
+			local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price€" && echo " - Margin: $margin" && echo " - (P/L): $profit€" && echo)
 		done
 	else
 		local TEXT="No runninig bot."
@@ -449,15 +475,12 @@ do
 		case $MSG in
 			/start)
 				start_quest
-				start_answer
 			;;
 			/stop)
 				stop_quest
-				stop_answer
 			;;
 			/restart)
 				restart_quest
-				restart_answer
 			;;
 			/status)
 				get_status
@@ -470,11 +493,9 @@ do
 			;;
 			/new)
 				new_quest
-				new_answer
 			;;
 			/del)
 				del_quest
-				del_answer
 			;;
 			/balance)
 				balance
