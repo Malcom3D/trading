@@ -103,6 +103,7 @@ merge_config() {
 
 init_git() {
         cd $DirName/../
+	git submodule update --remote --merge &>/dev/null
         git pull --recurse-submodules &>/dev/null
 }
 
