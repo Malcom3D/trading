@@ -39,7 +39,7 @@ stop() {
 
 enable() {
 	cd $ENABLED
-	ln -s $DirName/../availlable/$MARKET.json
+	ln -s ../availlable/$MARKET.json
 	echo $?
 	cd - &>/dev/null
 }
