@@ -100,7 +100,7 @@ bot_started() {
 	local enabled="$(bot_enabled)"
 	if [ -n "$enabled" ]
 	then
-		for i in "$enabled"
+		for i in $enabled
 		do
 			if [ "$(./trade.sh status "$i"EUR)" ]
 			then
