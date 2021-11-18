@@ -105,6 +105,7 @@ bot_started() {
 			if [ "$(./trade.sh status "$i"EUR)" ]
 			then
 				local started="$started $i"
+				log "DEBUG: bot_started: $started"
 			fi
 		done
 	fi
