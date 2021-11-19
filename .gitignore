@@ -1,8 +1,14 @@
 bin/*
 etc/keys/**
 !etc/keys/README.md
+!etc/trade.conf
 etc/config.d/enabled/**
 !etc/config.d/enabled/README.md
+logs/**
+logs/tracker/**
+!logs/tracker/README.md
+logs/telegrambot/**
+!logs/telegrambot/README.md
 include/*
 lib/*
 !lib/cryptobot
