@@ -1,1 +1,0 @@
-telegram data dir
