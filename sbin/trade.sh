@@ -24,8 +24,11 @@ trade() {
 	source $DirName/../bin/activate
 	rotate_log $MARKET
 
-	# --buymaxsize --enableml
-	until python3.9 pycryptobot.py --config /tmp/$MARKET.json --websocket --buymaxsize 50 --logfile $DirName/../logs/$MARKET.log --tradesfile $DirName/../logs/tracker/$MARKET.csv;
+	if [ -e $DirName/../etc/common.conf ]
+	then
+		source $DirName/../etc/trade.conf
+	fi
+	until python3.9 pycryptobot.py --config /tmp/$MARKET.json $OPTIONS --websocket --logfile $DirName/../logs/$MARKET.log --tradesfile $DirName/../logs/tracker/$MARKET.csv;
 	do
 		curl -s "https://api.telegram.org/bot$API_KEY/sendMessage?chat_id=$CHAT_ID&text=Warning: respawning $MARKET process"
 		sleep 1
@@ -85,7 +88,7 @@ log() {
 		for l in $LOGS
 		do
 			echo "==> $l.log <=="
-			tail -n 100 $DirName/../logs/$l.log | egrep -v "$l$|EUR$|^$|DEBUG" | tail -n $lines
+			tail -n 100 $DirName/../logs/$l.log | egrep -v "$l$|BUSD$|EUR$|^$|DEBUG" | tail -n $lines
 		done
 	fi
 }

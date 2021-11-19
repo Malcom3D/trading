@@ -16,6 +16,8 @@ ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled"))
 ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started"))
 CONTENT="Content-Type: application/json"
 
+# Currency list
+CURR_LIST="EUR BUSD"
 
 # logger funtion
 log() {
@@ -96,11 +98,48 @@ update_msg() {
         done
 }
 
+send_quest() {
+	JSON=$1
+	until $(curl -s -d "$JSON" -H "$CONTENT" -X POST $SEND_URL | jq .ok)
+	do
+		sleep 1
+	done
+}
+
+get_answer() {
+	local STATUS=true
+	while $STATUS
+	do
+		local ANS=$(curl -s -X GET $GET_URL | jq -r '.result[-1] | .callback_query | select(.data!=null) | .data')
+		if [ -n "$ANS" ]
+		then
+			# Acknowledge the query
+			local QUERY_ID=$(curl -s -X GET $GET_URL | jq -r '.result[-1] | .callback_query | select(.id!=null) | .id')
+			if [ -n "$QUERY_ID" ]
+			then
+				if $(curl -s -d chat_id=$CHAT_ID -d callback_query_id=$QUERY_ID -X POST $ANSWER_URL | jq .ok)
+				then
+					local STATUS=false
+				fi
+			fi
+		else
+			sleep 1
+		fi
+	done
+        if [ "$ANS" == "cancel" ]
+        then
+                local TEXT="Action cancelled by user."
+                change_last_msg "$TEXT"
+        else
+		echo $ANS
+	fi
+}
+
 bot_enabled() {
 	local files=(../etc/config.d/enabled/*.json)
 	if [ -e "${files[0]}" ]
 	then
-        	echo "$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/EUR\.json//')"
+        	echo "$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')"
 	fi
 }
 
@@ -111,7 +150,7 @@ bot_started() {
 	then
 		for i in $enabled
 		do
-			if [ "$(./trade.sh status "$i"EUR)" ]
+			if [ "$(./trade.sh status $i)" ]
 			then
 				local started="$started $i"
 			fi
@@ -159,8 +198,17 @@ put_in_row() {
 }
 
 new_quest() {
-	local enabled="$(bot_enabled)"
-	local availlable=$(ls ../etc/config.d/availlable/ | grep "\.json" | sed 's/EUR\.json//')
+	# choose your currency
+	local ROW=""
+	put_in_row "$CURR_LIST"
+	send_quest $(jo chat_id=$CHAT_ID text="Select currency:" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+	local currency="$(get_answer)"
+	local TEXT="Trading in $currency."
+	change_last_msg "$TEXT"
+
+	# choose your crypto coin
+	local enabled="$(echo $(bot_enabled) | grep $currency | sed "s/$currency//" )"
+	local availlable=$(ls ../etc/config.d/availlable/ | grep "$currency\.json" | sed "s/$currency\.json//")
 	if [ -n "$enabled" ]
 	then
 		for i in $enabled
@@ -169,29 +217,29 @@ new_quest() {
 		done
 	fi
 
-	if [ -n "$availlable" ]
+	if [ -z "$availlable" ]
 	then
-		local ROW=""
-		put_in_row "$availlable"
-		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-		new_answer
-	else
 		local TEXT="All bot enabled"
 		send_msg "$TEXT"
+	else
+		local ROW=""
+		put_in_row "$availlable"
+		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade:" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+		new_answer $currency
 	fi
 }
 
 new_answer() {
 	local ANSWER=$(get_answer)
+	local pair="$ANSWER$1"
 
 	if [ -n "$ANSWER" ]
 	then
-		local EUR="EUR"
-		if [ "$(./trade.sh enable $ANSWER$EUR)" ]
+		if [ "$(./trade.sh enable $pair)" ]
 		then
-			local TEXT="$ANSWER$EUR bot enabled."
+			local TEXT="$ANSWER->$1 bot enabled."
 		else
-			local TEXT="WARNING: error enabling $ANSWER$EUR bot."
+			local TEXT="WARNING: error enabling $ANSWER->$1 bot."
 		fi
 		change_last_msg "$TEXT"
 	fi
@@ -199,15 +247,15 @@ new_answer() {
 
 del_quest() {
 	local enabled="$(bot_enabled)"
-	if [ -n "$enabled" ]
+	if [ -z "$enabled" ]
 	then
-		local ROW=""
-		put_in_row "$enabled"
-	        send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-		del_answer
-	else
 		local TEXT="No bot enabled"
 		send_msg "$TEXT"
+	else
+		local ROW=""
+		put_in_row "$enabled"
+	        send_quest "$(jo chat_id=$CHAT_ID text="Select pair to remove:" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+		del_answer
 	fi
 }
 
@@ -216,12 +264,11 @@ del_answer() {
 
         if [ -n "$ANSWER" ]
         then
-                local EUR="EUR"
-		if [ "$(./trade.sh disable $ANSWER$EUR)" ]
+		if [ "$(./trade.sh disable $ANSWER)" ]
 		then
-                	local TEXT="$ANSWER$EUR bot disabled."
+                	local TEXT="$ANSWER bot disabled."
 		else
-                	local TEXT="WARNING: error disabling $ANSWER$EUR bot."
+                	local TEXT="WARNING: error disabling $ANSWER bot."
 		fi
                 change_last_msg "$TEXT"
         fi
@@ -229,16 +276,16 @@ del_answer() {
 
 start_quest() {
 	local unstarted="$(bot_unstarted)"
-	if [ -n "$unstarted" ]
+	if [ -z "$unstarted" ]
 	then
+		local TEXT="No bot enabled"
+		send_msg "$TEXT"
+	else
 		local ROW=""
 		put_in_row "$unstarted"
 		local ROW="$ALL_ENABLED $ROW"
 		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 		start_answer
-	else
-		local TEXT="No bot enabled"
-		send_msg "$TEXT"
 	fi
 }
 
@@ -247,12 +294,11 @@ start_answer() {
 
         if [ -n "$ANSWER" ] && [ "$ANSWER" != "all_enabled" ]
         then
-                local EUR="EUR"
-		if [ "$(./trade.sh start $ANSWER$EUR)" ]
+		if [ "$(./trade.sh start $ANSWER)" ]
 		then
-	                local TEXT="$ANSWER$EUR bot started."
+	                local TEXT="$ANSWER bot started."
 		else
-	                local TEXT="WARNING: error starting $ANSWER$EUR bot."
+	                local TEXT="WARNING: error starting $ANSWER bot."
 		fi
 	        change_last_msg "$TEXT"
         elif [ -n "$ANSWER" ] && [ "$ANSWER" == "all_enabled" ]
@@ -269,7 +315,7 @@ start_all() {
 	then
 		for i in $unstarted
 		do
-			if [ "$(./trade.sh start "$i"EUR)" ]
+			if [ "$(./trade.sh start $i)" ]
 			then
 		                local TEXT="$i bot started."
 			else
@@ -284,16 +330,16 @@ start_all() {
 
 stop_quest() {
 	started="$(bot_started)"
-	if [ -n "$started" ]
+	if [ -z "$started" ]
 	then
+		local TEXT="No running bot."
+		send_msg "$TEXT"
+	else
 		local ROW=""
 		put_in_row "$started"
        		local ROW="$ALL_STARTED $ROW"
        		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto bot to stop" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 		stop_answer
-	else
-		local TEXT="No running bot."
-		send_msg "$TEXT"
 	fi
 }
 
@@ -302,12 +348,11 @@ stop_answer() {
 
         if [ -n "$ANSWER" ] && [ "$ANSWER" != "all_started" ]
         then
-                local EUR="EUR"
-                if [ "$(./trade.sh stop $ANSWER$EUR)" ]
+                if [ "$(./trade.sh stop $ANSWER)" ]
 		then
-	                local TEXT="$ANSWER$EUR bot stopped."
+	                local TEXT="$ANSWER bot stopped."
 		else
-	                local TEXT="WARNING: error stopping $ANSWER$EUR bot."
+	                local TEXT="WARNING: error stopping $ANSWER bot."
 		fi
                 change_last_msg "$TEXT"
         elif [ -n "$ANSWER" ] && [ "$ANSWER" == "all_started" ]
@@ -324,7 +369,7 @@ stop_all() {
 	then
 		for i in $started
 		do
-			if [ "$(./trade.sh stop "$i"EUR)" ]
+			if [ "$(./trade.sh stop $i)" ]
 			then
 				local TEXT="$i bot stopped."
 			else
@@ -358,12 +403,11 @@ restart_answer() {
 
         if [ -n "$ANSWER" ] && [ "$ANSWER" != "all_started" ]
         then
-                local EUR="EUR"
-                if [ "$(./trade.sh restart $ANSWER$EUR)" ]
+                if [ "$(./trade.sh restart $ANSWER)" ]
                 then
-                        local TEXT="$ANSWER$EUR bot restarted."
+                        local TEXT="$ANSWER bot restarted."
                 else
-                        local TEXT="WARNING: error restarting $ANSWER$EUR bot."
+                        local TEXT="WARNING: error restarting $ANSWER bot."
                 fi
                 change_last_msg "$TEXT"
         elif [ -n "$ANSWER" ] && [ "$ANSWER" == "all_started" ]
@@ -375,50 +419,13 @@ restart_answer() {
         fi
 }
 
-send_quest() {
-	JSON=$1
-	until $(curl -s -d "$JSON" -H "$CONTENT" -X POST $SEND_URL | jq .ok)
-	do
-		sleep 1
-	done
-}
-
-get_answer() {
-	local STATUS=true
-	while $STATUS
-	do
-		local ANS=$(curl -s -X GET $GET_URL | jq -r '.result[-1] | .callback_query | select(.data!=null) | .data')
-		if [ -n "$ANS" ]
-		then
-			# Acknowledge the query
-			local QUERY_ID=$(curl -s -X GET $GET_URL | jq -r '.result[-1] | .callback_query | select(.id!=null) | .id')
-			if [ -n "$QUERY_ID" ]
-			then
-				if $(curl -s -d chat_id=$CHAT_ID -d callback_query_id=$QUERY_ID -X POST $ANSWER_URL | jq .ok)
-				then
-					local STATUS=false
-				fi
-			fi
-		else
-			sleep 1
-		fi
-	done
-        if [ "$ANS" == "cancel" ]
-        then
-                local TEXT="Action cancelled by user."
-                change_last_msg "$TEXT"
-        else
-		echo $ANS
-	fi
-}
-
 get_status() {
 	local enabled="$(bot_enabled)"
 	if [ -n "$enabled" ]
 	then
 	        for l in $enabled
 	        do
-	                if [ "$(./trade.sh status "$l"EUR)" ]
+	                if [ "$(./trade.sh status $l)" ]
 	                then
 				local TEXT=$(echo "$TEXT" && echo "$l bot is running")
 			else
@@ -437,13 +444,20 @@ get_margin() {
 	then
 		for l in $started
 		do
-			local info=$(tail -n 12 ../logs/"$l"EUR.log | grep INFO | tail -1)
+			local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
 			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
 			local margin=$(echo $info | grep "Margin" | cut -d"|" -f5 | cut -d":" -f2)
 			local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
 			if [ -n "$price" ] && [ -n "$margin" ] && [ -n "$profit" ]
 			then
-				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price€" && echo " - Margin: $margin" && echo " - (P/L): $profit€" && echo)
+				if [[ $l =~ "BUSD$" ]]
+				then
+					val="\$"
+				elif [[ $l =~ "EUR$" ]]
+				then
+					val="\€"
+				fi
+				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price $val" && echo " - Margin: $margin \%" && echo " - (P/L): $profit $val" && echo)
 			fi
 		done
 		if [ -z "$TEXT" ]
