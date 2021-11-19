@@ -4,6 +4,10 @@ source ../etc/keys/telegram.key
 
 # Define function
 
+exit_all() {
+	echo $OldIP > ../etc/ipckeck/ip.txt
+}
+
 ipCheck() {
 	oldIP=$(cat ../etc/ipcheck/ip.txt)
         while $True;
@@ -15,8 +19,8 @@ ipCheck() {
                         curl -s "https://api.telegram.org/bot$API_KEY/sendMessage?chat_id=$CHAT_ID&text=Open the following link and change API restriction."
                         curl -s "https://api.telegram.org/bot$API_KEY/sendMessage?chat_id=$CHAT_ID&text=https://www.binance.com/en/my/settings/api-management"
                         oldIP=$nowIP
-			echo $OldIP > ../etc/ipckeck/ip.txt
                 fi
+		trap exit_all SIGINT SIGTERM SIGKILL
                 sleep 15
         done
 }
