@@ -21,6 +21,7 @@ init_git() {
 	cd $DirName/../
 	if [ $(git pull > /dev/null 2>&1) ]
 	then
+		git pull --recurse-submodules > /dev/null 2>&1
 		git submodule update --remote --merge > /dev/null 2>&1
 		cd $DirName/../lib/cryptobot
 		source ../bin/activate
