@@ -233,7 +233,6 @@ new_quest() {
 new_answer() {
 	local ANSWER=$(get_answer)
 	local pair="$ANSWER$1"
-	log "$pair"
 
 	if [ -n "$ANSWER" ]
 	then
@@ -323,11 +322,12 @@ start_all() {
 			else
 		                local TEXT="WARNING: error starting $i bot."
 			fi
+			send_msg "$TEXT"
 		done
 	else
 		local TEXT="No bot enabled."
+		send_msg "$TEXT"
 	fi
-	send_msg "$TEXT"
 }
 
 stop_quest() {

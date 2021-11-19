@@ -27,14 +27,15 @@ balance() {
 		# Get value
 		local FREE=$(echo $FULL_WALLET | jq -r ".balances[] | select(.asset==\"$i\") | .free")
 		local LOCKED=$(echo $FULL_WALLET | jq -r ".balances[] | select(.asset==\"$i\") | .locked")
-		if [ "$i" != "EUR" ]
-		then
-			local PRICE=$(curl -s -S -X GET "https://api.binance.com/api/v3/ticker/price?symbol="$i"EUR" | jq -r ".price")
-		else
-			local PRICE="1"
-		fi
 		local VALUE=$(echo "$FREE + $LOCKED" | bc -l)
-		local VALUE_EUR=$(echo "scale=8;$VALUE * $PRICE" | bc -l)
+		if [[ $i =~ "BUSD" ]]
+		then
+			local CURR_PRICE=$(curl -s -S -X GET "https://api.binance.com/api/v3/ticker/price?symbol="$i"BUSD" | jq -r ".price")
+			local VALUE_EUR=$(echo "scale=8;$VALUE * $PRICE * $CURR_PRICE" | bc -l)
+		else
+			local PRICE=$(curl -s -S -X GET "https://api.binance.com/api/v3/ticker/price?symbol="$i"EUR" | jq -r ".price")
+			local VALUE_EUR=$(echo "scale=8;$VALUE * $PRICE" | bc -l)
+		fi
 		local ESTIMATED=$(echo "scale=8;$ESTIMATED + $VALUE_EUR" | bc -l)
 		echo "$i: $VALUE"
 	done
