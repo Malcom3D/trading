@@ -2,14 +2,18 @@
 # Telegram bot key and id
 source ../etc/keys/telegram.key
 
+# variable
+DirName=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)
+
 # Define function
 
 exit_all() {
-	echo $OldIP > ../etc/ipckeck/ip.txt
+	echo $oldIP > $DirName/../etc/ipcheck/ip.txt
+	exit 0
 }
 
 ipCheck() {
-	oldIP=$(cat ../etc/ipcheck/ip.txt)
+	oldIP=$(cat $DirName/../etc/ipcheck/ip.txt)
         while $True;
         do
                 nowIP=$(dig +short myip.opendns.com @resolver1.opendns.com)

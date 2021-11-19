@@ -16,9 +16,6 @@ ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled"))
 ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started"))
 CONTENT="Content-Type: application/json"
 
-# Currency list
-CURR_LIST="EUR BUSD"
-
 # logger funtion
 log() {
 	echo "$(date) $1" | tee -a /dev/null
@@ -198,13 +195,17 @@ put_in_row() {
 }
 
 new_quest() {
+	# Currency list
+	local CURR_LIST="EUR BUSD"
+
 	# choose your currency
 	local ROW=""
 	put_in_row "$CURR_LIST"
-	send_quest $(jo chat_id=$CHAT_ID text="Select currency:" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+	send_quest "$(jo chat_id=$CHAT_ID text="Select currency:" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 	local currency="$(get_answer)"
 	local TEXT="Trading in $currency."
 	change_last_msg "$TEXT"
+	update_msg
 
 	# choose your crypto coin
 	local enabled="$(echo $(bot_enabled) | grep $currency | sed "s/$currency//" )"
@@ -232,6 +233,7 @@ new_quest() {
 new_answer() {
 	local ANSWER=$(get_answer)
 	local pair="$ANSWER$1"
+	log "$pair"
 
 	if [ -n "$ANSWER" ]
 	then
@@ -486,6 +488,11 @@ get_trades() {
 	done
 }
 
+exit_all() {
+	stop_all
+	exit 0
+}
+
 log "INFO: Starting..."
 send_msg "Starting all enabled bot..."
 start_all
@@ -541,7 +548,7 @@ do
 				send_msg "Hei man, I'm only a bot"
 			;;
 		esac
-		trap stop_all SIGINT SIGTERM SIGKILL
+		trap exit_all SIGINT SIGTERM SIGKILL
 		update_msg
 	fi
 done
