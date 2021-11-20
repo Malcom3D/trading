@@ -28,21 +28,13 @@ init_git() {
 		python -m pip install -r requirements.txt -U > /dev/null 2>&1
 		deactivate
 		$DirName/$ScriptName &
-		exit 0
+		exit_all
 	fi
 }
 
-stop_ipCheck() {
-	screen -S ipCheck -X quit
-}
-
-stop_TelegramBot() {
-	screen -S TelegramBot -X quit
-}
-
 exit_all() {
-	stop_ipCheck
-	stop_TelegramBot
+	screen -S ipCheck -X quit
+	screen -S TelegramBot -X quit
 	exit 0
 }
 
