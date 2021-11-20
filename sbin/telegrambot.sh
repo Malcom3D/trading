@@ -216,7 +216,7 @@ put_in_row() {
 yes_no() {
 	YES_NO=$(jo -a $(jo text="Yes" callback_data="Yes") $(jo text="No" callback_data="No"))
 	local TEXT="$1 Are you sure?"
-	send_quest "$TEXT" "$YES_NO"
+	change_last_quest "$TEXT" "$YES_NO"
 	ANSWER=$(get_answer)
 	if [ -n "$ANSWER" ] && [ "$(get_answer)" = "YES" ]
 	then
@@ -567,7 +567,7 @@ balance() {
 }
 
 get_sys_log() {
-	send_msg "$(./system.sh log)"
+	change_last_msg "$(./system.sh log)"
 }
 
 get_sys_status() {
@@ -586,7 +586,7 @@ get_sys_status() {
 	else
 		local TEXT="No bot enabled."
 	fi
-	send_msg "$TEXT"
+	change_last_msg "$TEXT"
 }
 
 system_quest() {
@@ -606,6 +606,8 @@ system_quest() {
 				local TEXT="This action will restart all services."
 				if [ $(yes_no "$TEXT") ]
 				then
+					local TEXT="Restarting services"
+					change_last_msg "$TEXT"
 					./system.sh restart
 				fi
 			;;
@@ -613,6 +615,8 @@ system_quest() {
 				local TEXT="This action will reboot the system."
 				if [ $(yes_no "$TEXT") ]
 				then
+					local TEXT="Rebooting system"
+					change_last_msg "$TEXT"
 					./system.sh reboot
 				fi
 			;;
@@ -620,6 +624,8 @@ system_quest() {
 				local TEXT="This action will poweroff the system."
 				if [ $(yes_no "$TEXT") ]
 				then
+					local TEXT="Poweroff system"
+					change_last_msg "$TEXT"
 					./system.sh poweroff
 				fi
 			;;
