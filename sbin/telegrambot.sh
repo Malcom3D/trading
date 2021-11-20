@@ -8,12 +8,15 @@ GET_URL="$BASE_URL/getUpdates"
 SEND_URL="$BASE_URL/sendMessage"
 ANSWER_URL="$BASE_URL/answerCallbackQuery"
 EDIT_URL="$BASE_URL/editMessageText"
+EDIT_QUEST_URL="$BASE_URL/editMessageReplyMarkup"
 MENU_URL="$BASE_URL/setMyCommands"
 
 # Common options
-CANCEL=$(jo text="Cancel" callback_data="cancel")
+CANCEL=$(jo -a $(jo text="Cancel" callback_data="cancel"))
 ALL_ENABLED=$(jo -a $(jo text="AllEnabled" callback_data="all_enabled"))
 ALL_STARTED=$(jo -a $(jo text="AllStarted" callback_data="all_started"))
+PREV_PAGE=$(jo -a $(jo text="<-Prev" callback_data="PrevPage"))
+NEXT_PAGE=$(jo -a $(jo text="Next->" callback_data="NextPage"))
 CONTENT="Content-Type: application/json"
 
 # logger funtion
@@ -85,20 +88,25 @@ change_last_msg() {
 	done
 }
 
-update_msg() {
-	local UPDATE_ID=$(curl -s -X GET $GET_URL | jq -r '.result[-1].update_id')
-	local OFFSET=$(echo "$UPDATE_ID + 1" | bc)
-	until $(curl -s -d offset=$OFFSET -X GET $GET_URL | jq .ok)
-        do
-                log "DEBUG: Unable to mark message as read. Sleeping."
-                sleep 1
-        done
+change_last_quest() {
+	local TEXT=$1
+	local ROW=$2
+	local MESSAGE_ID=$(curl -s -X GET $GET_URL | jq -r '.result[-1] | .callback_query.message.message_id')
+	JSON="$(jo message_id=$MESSAGE_ID chat_id=$CHAT_ID text="$TEXT" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
+	until $(curl -s -d "$JSON" -H "$CONTENT" -X POST $EDIT_QUEST_URL | jq .ok)
+	do
+		log "DEBUG: Unable to change last quest message. Sleeping."
+		sleep 1
+	done
 }
-
+	
 send_quest() {
-	JSON=$1
+	local TEXT=$1
+	local ROW=$2
+	JSON="$(jo chat_id=$CHAT_ID text="$TEXT" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
 	until $(curl -s -d "$JSON" -H "$CONTENT" -X POST $SEND_URL | jq .ok)
 	do
+		log "DEBUG: Unable to send quest message. Sleeping."
 		sleep 1
 	done
 }
@@ -130,6 +138,16 @@ get_answer() {
         else
 		echo $ANS
 	fi
+}
+
+update_msg() {
+	local UPDATE_ID=$(curl -s -X GET $GET_URL | jq -r '.result[-1].update_id')
+	local OFFSET=$(echo "$UPDATE_ID + 1" | bc)
+	until $(curl -s -d offset=$OFFSET -X GET $GET_URL | jq .ok)
+        do
+                log "DEBUG: Unable to mark message as read. Sleeping."
+                sleep 1
+        done
 }
 
 bot_enabled() {
@@ -191,7 +209,74 @@ put_in_row() {
 	then
 		ROW="$ROW $(jo -a $BUTTONS)"
 	fi
-	ROW="$(jo -a $CANCEL) $ROW"
+}
+
+dialog_msg() {
+	local TEXT=$1
+	local LIST=$2
+	local OPTIONS=$3
+	local pages=()
+	local paged_list=""
+	local count=0
+	local page_num=0
+	local list_num=$(echo $LIST | wc -w)
+	for i in $LIST
+	do
+		((count++))
+		if [ $count -le 52 ]
+		then
+			local paged_list="$paged_list $i"
+		fi
+		if [ $count -gt 52 ] || [[ $LIST =~ $i$ ]]
+		then
+			local ROW=""
+			put_in_row "$paged_list"
+			if [ $list_num -gt 52 ] && [ $page_num -eq 0 ]
+			then
+				local ROW="$ROW $NEXT_PAGE"
+			elif [ $list_num -gt 52 ] && [ $page_num -gt 0 ] && ! [[ $LIST =~ $i$ ]]
+			then
+				local ROW="$PREV_PAGE $ROW $NEXT_PAGE"
+			elif [ $list_num -gt 52 ] && [ $page_num -gt 0 ] && [[ $LIST =~ $i$ ]]
+			then
+				local ROW="$PREV_PAGE $ROW"
+			fi
+			local pages[$page_num]="$OPTIONS $CANCEL $ROW"
+			((page_num++))
+			local count=0
+			local paged_list=""
+		fi
+	done
+
+	local num=0
+	local page_num=$[ $num + 1 ]
+	local MSG="$page_num/${#pages[@]} - $TEXT"
+	send_quest "$MSG" "${pages[$num]}"
+
+	while true
+	do
+		update_msg
+		local ANSWER=$(get_answer)
+
+		if [ "$ANSWER" == "PrevPage" ]
+		then
+			((num--))
+		elif [ "$ANSWER" == "NextPage" ]
+		then
+			((num++))
+		elif [ -n "$ANSWER" ] && [[ $LIST =~ $ANSWER ]]
+		then
+			echo $ANSWER
+			break
+		elif [ -z "$ANSWER" ]
+		then
+			break
+		fi
+
+		local page_num=$[ $num + 1 ]
+		local MSG="$page_num/${#pages[@]} - $TEXT"
+		change_last_quest "$MSG" "${pages[$num]}"
+	done
 }
 
 new_quest() {
@@ -199,10 +284,13 @@ new_quest() {
 	local CURR_LIST="EUR BUSD"
 
 	# choose your currency
-	local ROW=""
-	put_in_row "$CURR_LIST"
-	send_quest "$(jo chat_id=$CHAT_ID text="Select currency:" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-	local currency="$(get_answer)"
+	local TEXT="Select currency:"
+	local currency="$(dialog_msg "$TEXT" "$CURR_LIST")"
+	if [ -z "$currency" ]
+	then
+		send_msg "no currency selected."
+		return
+	fi
 	local TEXT="Trading in $currency."
 	change_last_msg "$TEXT"
 	update_msg
@@ -223,24 +311,18 @@ new_quest() {
 		local TEXT="All bot already enabled."
 		send_msg "$TEXT"
 	else
-		local ROW=""
-		put_in_row "$availlable"
-		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade:" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-		new_answer $currency
+		local TEXT="Select crypto to trade:"
+		local ANSWER=$(dialog_msg "$TEXT" "$availlable")
 	fi
-}
 
-new_answer() {
-	local ANSWER=$(get_answer)
-	local pair="$ANSWER$1"
-
+	local pair="$ANSWER$currency"
 	if [ -n "$ANSWER" ]
 	then
 		if [ "$(./trade.sh enable $pair)" ]
 		then
-			local TEXT="$ANSWER->$1 bot enabled."
+			local TEXT="$ANSWER->$currency 1 bot enabled."
 		else
-			local TEXT="WARNING: error enabling $ANSWER->$1 bot."
+			local TEXT="WARNING: error enabling $ANSWER->$currency bot."
 		fi
 		change_last_msg "$TEXT"
 	fi
@@ -253,15 +335,9 @@ del_quest() {
 		local TEXT="No bot enabled."
 		send_msg "$TEXT"
 	else
-		local ROW=""
-		put_in_row "$enabled"
-	        send_quest "$(jo chat_id=$CHAT_ID text="Select pair to remove:" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-		del_answer
+		local TEXT="Select pair to disable:"
+        	local ANSWER=$(dialog_msg "$TEXT" "$enabled")
 	fi
-}
-
-del_answer() {
-        local ANSWER=$(get_answer)
 
         if [ -n "$ANSWER" ]
         then
@@ -282,18 +358,11 @@ start_quest() {
 		local TEXT="No bot enabled."
 		send_msg "$TEXT"
 	else
-		local ROW=""
-		put_in_row "$unstarted"
-		local ROW="$ALL_ENABLED $ROW"
-		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto to trade" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-		start_answer
+		local TEXT="Select crypto to trade:"
+		local ANSWER=$(dialog_msg "$TEXT" "$unstarted" "$ALL_ENABLED")
 	fi
-}
 
-start_answer() {
-        local ANSWER=$(get_answer)
-
-        if [ -n "$ANSWER" ] && [ "$ANSWER" != "all_enabled" ]
+       	if [ -n "$ANSWER" ] && [ "$ANSWER" != "all_enabled" ]
         then
 		if [ "$(./trade.sh start $ANSWER)" ]
 		then
@@ -337,16 +406,9 @@ stop_quest() {
 		local TEXT="No running bot."
 		send_msg "$TEXT"
 	else
-		local ROW=""
-		put_in_row "$started"
-       		local ROW="$ALL_STARTED $ROW"
-       		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto bot to stop" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-		stop_answer
+		local TEXT="Select crypto bot to stop:"
+		local ANSWER=$(dialog_msg "$TEXT" "$started" "$ALL_STARTED")
 	fi
-}
-
-stop_answer() {
-        local ANSWER=$(get_answer)
 
         if [ -n "$ANSWER" ] && [ "$ANSWER" != "all_started" ]
         then
@@ -392,16 +454,9 @@ restart_quest() {
 		local TEXT="No running bot."
 		send_msg "$TEXT"
 	else
-		local ROW=""
-		put_in_row "$started"
-       		local ROW="$ALL_STARTED $ROW"
-       		send_quest "$(jo chat_id=$CHAT_ID text="Select crypto bot to restart" reply_markup=$(jo inline_keyboard=$(jo -a $ROW)))"
-		restart_answer
+		local TEXT="Select crypto bot to restart:"
+		ANSWER=$(dialog_msg "$TEXT" "$started" "$ALL_STARTED")
 	fi
-}
-
-restart_answer() {
-        local ANSWER=$(get_answer)
 
         if [ -n "$ANSWER" ] && [ "$ANSWER" != "all_started" ]
         then
