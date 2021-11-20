@@ -39,7 +39,6 @@ exit_all() {
 }
 
 init() {
-	count=0
 	init_git
 	while true
 	do
@@ -51,13 +50,8 @@ init() {
 				init_$i
 			fi
 		done
-		((count++))
-		if [ $count -ge 2880 ]
-		then
-			count=0
-			init_git
-		fi
 		trap exit_all SIGINT SIGTERM SIGKILL
+		init_git
 		sleep 15
 	done
 }
