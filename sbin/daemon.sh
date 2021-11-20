@@ -41,6 +41,7 @@ stop_TelegramBot() {
 exit_all() {
 	stop_ipCheck
 	stop_TelegramBot
+	echo "GoodBye"
 	exit 0
 }
 
