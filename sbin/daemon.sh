@@ -20,7 +20,7 @@ init_TelegramBot() {
 
 init_git() {
 	cd $DirName/../
-	if [[ $(git status --porcelain) ]];
+	if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]
 	then
 		git pull > /dev/null 2>&1
 		git pull --recurse-submodules > /dev/null 2>&1
@@ -29,7 +29,6 @@ init_git() {
 		source ../bin/activate
 		python -m pip install -r requirements.txt -U > /dev/null 2>&1
 		deactivate
-		cd $DirName
 		sudo systemctl restart trading
 	fi
 }
@@ -49,6 +48,7 @@ exit_all() {
 }
 
 init() {
+	count=0
 	init_git
 	while true
 	do
@@ -61,6 +61,11 @@ init() {
 			fi
 		done
 		trap exit_all SIGINT SIGTERM SIGKILL
+		((count++)
+		if [ $count == 2880 ]
+		then
+			init_git
+		fi
 		sleep 15
 	done
 }
