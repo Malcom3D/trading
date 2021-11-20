@@ -242,7 +242,6 @@ dialog_msg() {
 				local ROW="$PREV_PAGE $ROW"
 			fi
 			local pages[$page_num]="$OPTIONS $CANCEL $ROW"
-			send_msg "${pages[$page_num]}"
 			((page_num++))
 			local count=0
 			local paged_list=""
