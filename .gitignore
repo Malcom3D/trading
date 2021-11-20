@@ -2,7 +2,7 @@ bin/*
 etc/keys/*
 etc/trade.conf
 etc/config.d/enabled/*
-logs/*
+logs/*.log
 logs/tracker/*
 logs/telegrambot/*
 include/*
