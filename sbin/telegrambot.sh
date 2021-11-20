@@ -218,12 +218,12 @@ yes_no() {
 	local TEXT="$1 Are you sure?"
 	change_last_quest "$TEXT" "$YES_NO"
 	ANSWER=$(get_answer)
-	if [ -n "$ANSWER" ] && [ "$(get_answer)" = "YES" ]
+	if [ -n "$ANSWER" ] && [ "$(get_answer)" == "YES" ]
 	then
-		true
-	elif [ -n "$ANSWER" ] && [ "$(get_answer)" = "NO" ]
+		echo "true"
+	elif [ -n "$ANSWER" ] && [ "$(get_answer)" == "NO" ]
 	then
-		false
+		echo "false"
 	fi
 }
 
@@ -571,6 +571,7 @@ get_sys_log() {
 }
 
 get_sys_status() {
+	local TEXT=""
 	local enabled="$(bot_enabled)"
 	if [ -n "$enabled" ]
 	then
