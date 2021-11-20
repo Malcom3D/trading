@@ -10,6 +10,7 @@ lib/*
 lib64
 pyvenv.cfg
 !lib/cryptobot
+!etc/ipcheck/ip.txt
 !etc/keys/.gitkeep
 !logs/tracker/.gitkeep
 !logs/telegrambot/.gitkeep
