@@ -24,7 +24,7 @@ init_git() {
 		git pull --recurse-submodules > /dev/null 2>&1
 		git submodule update --remote --merge > /dev/null 2>&1
 		cd $DirName/../lib/cryptobot
-		source bin/activate
+		source $DirName/../bin/activate
 		python -m pip install -r requirements.txt -U > /dev/null 2>&1
 		deactivate
 		$DirName/$ScriptName &
