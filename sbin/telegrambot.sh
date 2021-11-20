@@ -242,6 +242,7 @@ dialog_msg() {
 				local ROW="$PREV_PAGE $ROW"
 			fi
 			local pages[$page_num]="$OPTIONS $CANCEL $ROW"
+			send_msg "${pages[$page_num]}"
 			((page_num++))
 			local count=0
 			local paged_list=""
@@ -514,7 +515,7 @@ get_margin() {
 				then
 					val="\€"
 				fi
-				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price $val" && echo " - Margin: $margin \%" && echo " - (P/L): $profit $val" && echo)
+				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price $val" && echo " - Margin: $margin %" && echo " - (P/L): $profit $val" && echo)
 			fi
 		done
 		if [ -z "$TEXT" ]
