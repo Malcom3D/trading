@@ -52,8 +52,9 @@ init() {
 			fi
 		done
 		((count++))
-		if [ "$count" == "2880" ]
+		if [ $count -ge 2880 ]
 		then
+			count=0
 			init_git
 		fi
 		trap exit_all SIGINT SIGTERM SIGKILL
