@@ -61,7 +61,7 @@ rotate_log() {
                 else
                         lastOld="$MARKET.log"
                 fi
-                if [ -n "$lastOld" ] && [ -e "../logs/$lastOld" ]
+                if [ -n "$lastOld" ] && [ -e "$DirName/../logs/$lastOld" ]
                 then
                         version=$[ $k +1 ]
                         mv $DirName/../logs/$lastOld $DirName/../logs/$MARKET.log.$version
