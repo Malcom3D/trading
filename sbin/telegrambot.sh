@@ -225,6 +225,8 @@ yes_no() {
 	elif [ -n "$ANSWER" ] && [ "$(get_answer)" == "NO" ]
 	then
 		echo "false"
+	else
+		change_last_msg "$ANSWER"
 	fi
 }
 
