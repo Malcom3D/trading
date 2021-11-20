@@ -648,13 +648,12 @@ exit_all() {
 	exit 0
 }
 
-log "INFO: Starting..."
-send_msg "Starting all enabled bot..."
-start_all
-
 # update menu list with commands
 log "DEBUG: Updating Menu"
 update_menu
+
+log "INFO: Starting..."
+send_msg "System up&running."
 
 # set init var
 LAST_MSG=$(last_msg)
