@@ -217,6 +217,7 @@ yes_no() {
 	YES_NO=$(jo -a $(jo text="Yes" callback_data="Yes") $(jo text="No" callback_data="No"))
 	local TEXT="$1 Are you sure?"
 	change_last_quest "$TEXT" "$YES_NO"
+	update_msg
 	ANSWER=$(get_answer)
 	if [ -n "$ANSWER" ] && [ "$(get_answer)" == "YES" ]
 	then
