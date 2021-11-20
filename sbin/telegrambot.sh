@@ -653,7 +653,7 @@ log "DEBUG: Updating Menu"
 update_menu
 
 log "INFO: Starting..."
-send_msg "System up&running."
+send_msg "System up and running."
 
 log "INFO: Start all enabled bot."
 send_msg "Start all enabled bot."
