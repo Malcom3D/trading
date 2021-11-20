@@ -661,8 +661,6 @@ update_menu
 # set init var
 LAST_MSG=$(last_msg)
 
-send_msg "Your automatic trading solution is up&runnning"
-
 log "DEBUG: starting main loop"
 while true
 do
