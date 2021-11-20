@@ -20,7 +20,7 @@ init_TelegramBot() {
 
 init_git() {
 	cd $DirName/../
-	if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]
+	if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]
 	then
 		git pull > /dev/null 2>&1
 		git pull --recurse-submodules > /dev/null 2>&1
@@ -61,12 +61,12 @@ init() {
 				init_$i
 			fi
 		done
-		trap exit_all SIGINT SIGTERM SIGKILL
 		((count++)
 		if [ "$count" == "2880" ]
 		then
 			init_git
 		fi
+		trap exit_all SIGINT SIGTERM SIGKILL
 		sleep 15
 	done
 }
