@@ -36,7 +36,8 @@ update_menu() {
 	local MENU_MARGIN="$(jo command="/margin" description="Show bot margin")"
 	local MENU_TRADES="$(jo command="/trades" description="Show trading history")"
 	local MENU_HELP="$(jo command="/help" description="Show help text")"
-	local COMMANDS="$(jo -a "$MENU_HELP" "$MENU_STATUS" "$MENU_MARGIN" "$MENU_TRADES" "$MENU_BALANCE" "$MENU_START" "$MENU_STOP" "$MENU_RESTART" "$MENU_NEW" "$MENU_DEL")"
+	local MENU_SYSTEM="$(jo command="/system" description="Command to interact with system")"
+	local COMMANDS="$(jo -a "$MENU_HELP" "$MENU_STATUS" "$MENU_MARGIN" "$MENU_TRADES" "$MENU_BALANCE" "$MENU_START" "$MENU_STOP" "$MENU_RESTART" "$MENU_NEW" "$MENU_DEL" "$MENU_SYSTEM")"
 
 	if [ $(curl -s -d commands="" -H "$CONTENT" -X POST $MENU_URL | jq .ok) ]
 	then
@@ -49,17 +50,18 @@ update_menu() {
 }
 
 help() {
-	local HELP="/help         Show this message"
-	local STATUS="/status         Show bots status"
-	local MARGIN="/margin         Show bots margin"
-	local TRADES="/trades         Show trading history"
-	local BALANCE="/balance         Show wallet balance"
-	local START="/start          Start bot for selected crypto"
-	local STOP="/stop           Stop bot for selected crypto"
+	local HELP="/help		Show this message"
+	local STATUS="/status		Show bots status"
+	local MARGIN="/margin		Show bots margin"
+	local TRADES="/trades		Show trading history"
+	local BALANCE="/balance		Show wallet balance"
+	local START="/start		 Start bot for selected crypto"
+	local STOP="/stop		Stop bot for selected crypto"
 	local RESTART="/restart		Restart running bots"
-	local NEW="/new            Enable trading for selected crypto"
-	local DEL="/del            Disable trading for selected crypto"
-	printf "$HELP\n$STATUS\n$MARGIN\n$TRADES\n$BALANCE\n$START\n$STOP\n$RESTART\n$NEW\n$DEL"
+	local NEW="/new		Enable trading for selected crypto"
+	local DEL="/del		Disable trading for selected crypto"
+	local SYSTEM="/system		Command to interact with system"
+	printf "$HELP\n$STATUS\n$MARGIN\n$TRADES\n$BALANCE\n$START\n$STOP\n$RESTART\n$NEW\n$DEL\n$SYSTEM"
 }
 
 # Get date of lastest message in buffer
@@ -208,6 +210,20 @@ put_in_row() {
 	if [ -n "$BUTTONS" ]
 	then
 		ROW="$ROW $(jo -a $BUTTONS)"
+	fi
+}
+
+yes_no() {
+	YES_NO=$(jo -a $(jo text="Yes" callback_data="Yes") $(jo text="No" callback_data="No"))
+	local TEXT="$1 Are you sure?"
+	send_quest "$TEXT" "$YES_NO"
+	ANSWER=$(get_answer)
+	if [ -n "$ANSWER" ] && [ "$(get_answer)" = "YES" ]
+	then
+		true
+	elif [ -n "$ANSWER" ] && [ "$(get_answer)" = "NO" ]
+	then
+		false
 	fi
 }
 
@@ -476,25 +492,32 @@ restart_quest() {
         fi
 }
 
-get_status() {
-	local enabled="$(bot_enabled)"
-	if [ -n "$enabled" ]
+get_bot_status() {
+	local started="$(bot_started)"
+	if [ -n "$started" ]
 	then
-	        for l in $enabled
-	        do
-	                if [ "$(./trade.sh status $l)" ]
-	                then
-				local TEXT=$(echo "$TEXT" && echo "$l bot is running.")
-			else
-				local TEXT=$(echo "$TEXT" && echo "$l bot is not running.")
+		for l in $started
+		do
+			local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
+			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
+			if [ -n "$price" ]
+			then
+				if [[ $l =~ "BUSD$" ]]
+				then
+					val="\$"
+				elif [[ $l =~ "EUR$" ]]
+				then
+					val="\€"
+				fi
+				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price $val" && echo)
 			fi
 		done
 	else
-		local TEXT="No bot enabled."
+		local TEXT="No running bot."
 	fi
 	send_msg "$TEXT"
 }
-
+	
 get_margin() {
 	local started="$(bot_started)"
 	if [ -n "$started" ]
@@ -543,6 +566,66 @@ get_trades() {
 	done
 }
 
+get_sys_status() {
+	local enabled="$(bot_enabled)"
+	if [ -n "$enabled" ]
+	then
+	        for l in $enabled
+	        do
+	                if [ "$(./trade.sh status $l)" ]
+	                then
+				local TEXT=$(echo "$TEXT" && echo "$l bot is running.")
+			else
+				local TEXT=$(echo "$TEXT" && echo "$l bot is not running.")
+			fi
+		done
+	else
+		local TEXT="No bot enabled."
+	fi
+	send_msg "$TEXT"
+}
+
+get_sys_log() {
+	send_msg "$(tail /var/log/syslog)"
+}
+
+system_quest() {
+	local OPT="Services ViewLog Restart Reboot Poweroff"
+	local TEXT="Select desired action:"
+	ANSWER=$(dialog_msg "$TEXT" "$OPT")
+	if [ -n "$ANSWER" ]
+	then
+		case $ANSWER in
+			Services)
+				get_sys_status
+			;;
+			ViewLog)
+				get_sys_log
+			;;
+			Restart)
+				local TEXT="This action will restart all services."
+				if [ $(yes_no "$TEXT") ]
+				then
+					sudo /usr/bin/systemctl restart trading
+				fi
+			;;
+			Reboot)
+				local TEXT="This action will reboot the system."
+				if [ $(yes_no "$TEXT") ]
+				then
+					sudo /usr/bin/reboot
+				fi
+			;;
+			Poweroff)
+				local TEXT="This action will poweroff the system."
+				if [ $(yes_no "$TEXT") ]
+				then
+					sudo /usr/bin/poweroff
+				fi
+			;;
+		esac
+	fi
+}
 exit_all() {
 	stop_all
 	exit 0
@@ -579,7 +662,7 @@ do
 				restart_quest
 			;;
 			/status)
-				get_status
+				get_bot_status
 			;;
 			/margin)
 				get_margin
@@ -595,6 +678,9 @@ do
 			;;
 			/balance)
 				balance
+			;;
+			/system)
+				system_quest
 			;;
 			/help|/*)
 				send_msg "$(help)"
