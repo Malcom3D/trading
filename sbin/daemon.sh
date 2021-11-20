@@ -17,7 +17,8 @@ init_TelegramBot() {
 
 init_git() {
 	cd $DirName/../
-	if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]
+	git fetch origin
+	if [ -n "$(git log HEAD..origin/main --oneline)" ]
 	then
 		git pull > /dev/null 2>&1
 		git pull --recurse-submodules > /dev/null 2>&1
