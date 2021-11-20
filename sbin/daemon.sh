@@ -1,6 +1,7 @@
 #!/bin/bash
 # Define some variable
 DirName=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)
+ScriptName=`basename "$0"`
 
 # Telegram bot key and id
 source $DirName/../etc/keys/telegram.key
@@ -19,19 +20,31 @@ init_TelegramBot() {
 
 init_git() {
 	cd $DirName/../
-	if [ $(git pull > /dev/null 2>&1) ]
+	if [[ $(git status --porcelain) ]];
 	then
+		git pull > /dev/null 2>&1
 		git pull --recurse-submodules > /dev/null 2>&1
 		git submodule update --remote --merge > /dev/null 2>&1
 		cd $DirName/../lib/cryptobot
 		source ../bin/activate
 		python -m pip install -r requirements.txt -U > /dev/null 2>&1
+		deactivate
+		cd $DirName
+		sudo systemctl restart trading
 	fi
 }
 
-exit_all() {
+stop_ipCheck() {
 	screen -S ipCheck -X quit
+}
+
+stop_TelegramBot() {
 	screen -S TelegramBot -X quit
+}
+
+exit_all() {
+	stop_ipCheck
+	stop_TelegramBot
 	exit 0
 }
 
