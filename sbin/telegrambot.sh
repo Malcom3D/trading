@@ -550,10 +550,6 @@ get_margin() {
 	send_msg "$TEXT"
 }
 
-balance() {
-	send_msg "$(./balance.sh)"
-}
-
 get_trades() {
 	JSON="../logs/telegrambot/telegram_data/data.json"
 	jq -r '.trades | keys' $JSON | sed -e '/\[/d' -e '/\]/d' -e 's/^  //' -e 's/\,//' | while read DATE
@@ -564,6 +560,14 @@ get_trades() {
 		local TEXT=$(echo $PAIR && echo $DATE && echo " - Sell Price: $PRICE€" && echo " - Margin: $MARGIN")
 		send_msg "$TEXT"
 	done
+}
+
+balance() {
+	send_msg "$(./balance.sh)"
+}
+
+get_sys_log() {
+	send_msg "$(./system.sh log)"
 }
 
 get_sys_status() {
@@ -585,10 +589,6 @@ get_sys_status() {
 	send_msg "$TEXT"
 }
 
-get_sys_log() {
-	send_msg "$(tail /var/log/syslog)"
-}
-
 system_quest() {
 	local OPT="Services ViewLog Restart Reboot Poweroff"
 	local TEXT="Select desired action:"
@@ -606,21 +606,21 @@ system_quest() {
 				local TEXT="This action will restart all services."
 				if [ $(yes_no "$TEXT") ]
 				then
-					sudo /usr/bin/systemctl restart trading
+					./system.sh restart
 				fi
 			;;
 			Reboot)
 				local TEXT="This action will reboot the system."
 				if [ $(yes_no "$TEXT") ]
 				then
-					sudo /usr/bin/reboot
+					./system.sh reboot
 				fi
 			;;
 			Poweroff)
 				local TEXT="This action will poweroff the system."
 				if [ $(yes_no "$TEXT") ]
 				then
-					sudo /usr/bin/poweroff
+					./system.sh poweroff
 				fi
 			;;
 		esac
