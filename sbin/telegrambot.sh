@@ -503,12 +503,12 @@ get_bot_status() {
 			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2 | awk '{print $1}')
 			if [ -n "$price" ]
 			then
-				if [[ $l =~ "BUSD$" ]]
+				if [[ $l =~ "BUSD" ]]
 				then
-					val="\$"
-				elif [[ $l =~ "EUR$" ]]
+					local val="$"
+				elif [[ $l =~ "EUR" ]]
 				then
-					val="€"
+					local val="€"
 				fi
 				local TEXT=$(echo "$TEXT" && echo "$l - Price: $price $val" && echo)
 			fi
@@ -531,12 +531,12 @@ get_margin() {
 			local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
 			if [ -n "$price" ] && [ -n "$margin" ] && [ -n "$profit" ]
 			then
-				if [[ $l =~ "BUSD$" ]]
+				if [[ $l =~ "BUSD" ]]
 				then
-					val="\$"
-				elif [[ $l =~ "EUR$" ]]
+					local val="$"
+				elif [[ $l =~ "EUR" ]]
 				then
-					val="\€"
+					local val="€"
 				fi
 				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price $val" && echo " - Margin: $margin %" && echo " - (P/L): $profit $val" && echo)
 			fi
