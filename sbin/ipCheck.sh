@@ -7,11 +7,6 @@ DirName=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)
 
 # Define function
 
-exit_all() {
-	echo $oldIP > $DirName/../etc/ipcheck/ip.txt
-	exit 0
-}
-
 ipCheck() {
 	oldIP=$(cat $DirName/../etc/ipcheck/ip.txt)
         while $True;
@@ -23,8 +18,8 @@ ipCheck() {
                         curl -s "https://api.telegram.org/bot$API_KEY/sendMessage?chat_id=$CHAT_ID&text=Open the following link and change API restriction."
                         curl -s "https://api.telegram.org/bot$API_KEY/sendMessage?chat_id=$CHAT_ID&text=https://www.binance.com/en/my/settings/api-management"
                         oldIP=$nowIP
+			echo $oldIP > $DirName/../etc/ipcheck/ip.txt
                 fi
-		trap exit_all SIGINT SIGTERM SIGKILL
                 sleep 15
         done
 }
