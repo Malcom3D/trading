@@ -609,6 +609,9 @@ system_quest() {
 					local TEXT="Restarting services"
 					change_last_msg "$TEXT"
 					./system.sh restart
+				else
+					local TEXT="Restart aborted"
+					change_last_msg "$TEXT"
 				fi
 			;;
 			Reboot)
@@ -618,6 +621,9 @@ system_quest() {
 					local TEXT="Rebooting system"
 					change_last_msg "$TEXT"
 					./system.sh reboot
+				else
+					local TEXT="Reboot aborted"
+					change_last_msg "$TEXT"
 				fi
 			;;
 			Poweroff)
@@ -627,6 +633,9 @@ system_quest() {
 					local TEXT="Poweroff system"
 					change_last_msg "$TEXT"
 					./system.sh poweroff
+				else
+					local TEXT="Poweroff aborted"
+					change_last_msg "$TEXT"
 				fi
 			;;
 		esac
