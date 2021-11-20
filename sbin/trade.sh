@@ -106,13 +106,6 @@ merge_config() {
 	echo $JSON > /tmp/$MARKET.json
 }
 
-init_git() {
-        cd $DirName/../
-        git pull > /dev/null 2>&1
-	git pull --recurse-submodules > /dev/null 2>&1
-	git submodule update --remote --merge > /dev/null 2>&1
-}
-
 # Check passed argument
 if [ "$1" != "log" ] && [ -z "$2" ]
 then
@@ -126,7 +119,6 @@ case $1 in
 		trade
 	;;
 	start)
-		init_git
 		start
 	;;
 	stop)
@@ -137,11 +129,9 @@ case $1 in
 	;;
 	restart)
 		stop
-		init_git
 		start
 	;;
 	enable)
-		init_git
 		enable
 	;;
 	disable)
