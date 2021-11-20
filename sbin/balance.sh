@@ -1,4 +1,5 @@
 #!/bin/bash
+#
 
 balance() {
 	# source binance keys
