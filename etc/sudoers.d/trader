@@ -1,2 +1,2 @@
-Cmnd_Alias	TRADER = /usr/bin/poweroff, /usr/bin/reboot, /usr/bin/systemctl restart trading
+Cmnd_Alias	TRADER = /usr/bin/poweroff, /usr/bin/reboot, /usr/bin/chown trader. etc/sudoers.d/trader, /usr/bin/chown root. etc/sudoers.d/trader, /usr/bin/systemctl restart trading
 trader ALL = NOPASSWD: TRADER
