@@ -20,9 +20,7 @@ init_git() {
 	git fetch origin > /dev/null 2>&1
 	if [ -n "$(git log HEAD..origin/main --oneline)" ]
 	then
-		sudo /usr/bin/chown trader. etc/sudoers.d/trader
 		git pull > /dev/null 2>&1
-		sudo /usr/bin/chown root. etc/sudoers.d/trader
 		git pull --recurse-submodules > /dev/null 2>&1
 		git submodule update --remote --merge > /dev/null 2>&1
 		cd $DirName/../lib/cryptobot
