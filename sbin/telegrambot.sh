@@ -508,7 +508,7 @@ get_bot_status() {
 					val="\$"
 				elif [[ $l =~ "EUR$" ]]
 				then
-					val="\€"
+					val="€"
 				fi
 				local TEXT=$(echo "$TEXT" && echo "$l - Price: $price $val" && echo)
 			fi
