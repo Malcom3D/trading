@@ -220,7 +220,7 @@ new_quest() {
 
 	if [ -z "$availlable" ]
 	then
-		local TEXT="All bot enabled"
+		local TEXT="All bot already enabled."
 		send_msg "$TEXT"
 	else
 		local ROW=""
@@ -250,7 +250,7 @@ del_quest() {
 	local enabled="$(bot_enabled)"
 	if [ -z "$enabled" ]
 	then
-		local TEXT="No bot enabled"
+		local TEXT="No bot enabled."
 		send_msg "$TEXT"
 	else
 		local ROW=""
@@ -279,7 +279,7 @@ start_quest() {
 	local unstarted="$(bot_unstarted)"
 	if [ -z "$unstarted" ]
 	then
-		local TEXT="No bot enabled"
+		local TEXT="No bot enabled."
 		send_msg "$TEXT"
 	else
 		local ROW=""
@@ -429,9 +429,9 @@ get_status() {
 	        do
 	                if [ "$(./trade.sh status $l)" ]
 	                then
-				local TEXT=$(echo "$TEXT" && echo "$l bot is running")
+				local TEXT=$(echo "$TEXT" && echo "$l bot is running.")
 			else
-				local TEXT=$(echo "$TEXT" && echo "$l bot is not running")
+				local TEXT=$(echo "$TEXT" && echo "$l bot is not running.")
 			fi
 		done
 	else
@@ -464,7 +464,7 @@ get_margin() {
 		done
 		if [ -z "$TEXT" ]
 		then
-			TEXT="No trade for running bot"
+			TEXT="No trade for running bot."
 		fi
 	else
 		local TEXT="No running bot."
