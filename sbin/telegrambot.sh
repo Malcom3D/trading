@@ -221,10 +221,10 @@ yes_no() {
 	ANSWER=$(get_answer)
 	if [ -n "$ANSWER" ] && [ "$(get_answer)" == "Yes" ]
 	then
-		echo "true"
+		/usr/bin/true
 	elif [ -n "$ANSWER" ] && [ "$(get_answer)" == "No" ]
 	then
-		echo "false"
+		/usr/bin/false
 	fi
 }
 
@@ -606,7 +606,7 @@ system_quest() {
 			;;
 			Restart)
 				local TEXT="This action will restart all services."
-				if [ $(yes_no "$TEXT") ]
+				if $(yes_no "$TEXT")
 				then
 					local TEXT="Restarting services"
 					change_last_msg "$TEXT"
@@ -618,7 +618,7 @@ system_quest() {
 			;;
 			Reboot)
 				local TEXT="This action will reboot the system."
-				if [ $(yes_no "$TEXT") ]
+				if $(yes_no "$TEXT")
 				then
 					local TEXT="Rebooting system"
 					change_last_msg "$TEXT"
@@ -630,7 +630,7 @@ system_quest() {
 			;;
 			Poweroff)
 				local TEXT="This action will poweroff the system."
-				if [ $(yes_no "$TEXT") ]
+				if $(yes_no "$TEXT")
 				then
 					local TEXT="Poweroff system"
 					change_last_msg "$TEXT"
