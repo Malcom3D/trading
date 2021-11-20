@@ -7,9 +7,9 @@ case $1 in
 		sudo /usr/bin/systemctl restart trading
 	;;
 	reboot)
-		sudo /usr/bin/reboot
+		sudo /usr/sbin/reboot
 	;;
 	poweroff)
-		sudo /usr/bin/poweroff
+		sudo /usr/sbin/poweroff
 	;;
 esac
