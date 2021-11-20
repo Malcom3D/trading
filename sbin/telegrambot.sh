@@ -655,6 +655,10 @@ update_menu
 log "INFO: Starting..."
 send_msg "System up&running."
 
+log "INFO: Start all enabled bot."
+send_msg "Start all enabled bot."
+start_all
+
 # set init var
 LAST_MSG=$(last_msg)
 
