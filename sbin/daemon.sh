@@ -29,7 +29,8 @@ init_git() {
 		source ../bin/activate
 		python -m pip install -r requirements.txt -U > /dev/null 2>&1
 		deactivate
-		sudo systemctl restart trading
+		kill -p $(ps -ef | grep trader | grep "daemon\.sh" | head -1 | awk '{print $2}')
+		#sudo systemctl restart trading
 	fi
 }
 
@@ -62,7 +63,7 @@ init() {
 		done
 		trap exit_all SIGINT SIGTERM SIGKILL
 		((count++)
-		if [ $count == 2880 ]
+		if [ "$count" == "2880" ]
 		then
 			init_git
 		fi
