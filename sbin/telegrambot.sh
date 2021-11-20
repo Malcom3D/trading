@@ -219,10 +219,10 @@ yes_no() {
 	change_last_quest "$TEXT" "$YES_NO"
 	update_msg
 	ANSWER=$(get_answer)
-	if [ -n "$ANSWER" ] && [ "$(get_answer)" == "YES" ]
+	if [ -n "$ANSWER" ] && [ "$(get_answer)" == "Yes" ]
 	then
 		echo "true"
-	elif [ -n "$ANSWER" ] && [ "$(get_answer)" == "NO" ]
+	elif [ -n "$ANSWER" ] && [ "$(get_answer)" == "No" ]
 	then
 		echo "false"
 	else
