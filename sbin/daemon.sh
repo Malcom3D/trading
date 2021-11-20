@@ -1,10 +1,6 @@
 #!/bin/bash
 # Define some variable
 DirName=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)
-ScriptName=`basename "$0"`
-
-# Telegram bot key and id
-source $DirName/../etc/keys/telegram.key
 
 # Define function
 
@@ -29,7 +25,7 @@ init_git() {
 		source ../bin/activate
 		python -m pip install -r requirements.txt -U > /dev/null 2>&1
 		deactivate
-		kill -p $(ps -ef | grep trader | grep "daemon\.sh" | head -1 | awk '{print $2}')
+		kill -9 $(ps -ef | grep trader | grep "daemon\.sh" | head -1 | awk '{print $2}')
 		#sudo systemctl restart trading
 	fi
 }
@@ -61,7 +57,7 @@ init() {
 				init_$i
 			fi
 		done
-		((count++)
+		((count++))
 		if [ "$count" == "2880" ]
 		then
 			init_git
