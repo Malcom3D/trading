@@ -39,7 +39,6 @@ exit_all() {
 }
 
 init() {
-	init_git
 	while true
 	do
 		screen -wipe > /dev/null 2>&1
