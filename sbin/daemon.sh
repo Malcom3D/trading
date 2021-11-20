@@ -54,4 +54,5 @@ init() {
 	done
 }
 
+init_git
 init
