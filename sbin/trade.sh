@@ -17,7 +17,6 @@ start() {
 		screen -dmS $MARKET $DirName/../sbin/$ScriptName trade $MARKET
 		echo $?
 	fi
-	cd - > /dev/null 2>&1
 }
 
 trade() {
@@ -46,7 +45,6 @@ enable() {
 	cd $ENABLED
 	ln -s ../availlable/$MARKET.json
 	echo $?
-	cd - > /dev/null 2>&1
 }
 
 disable() {
