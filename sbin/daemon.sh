@@ -28,7 +28,7 @@ init_git() {
 		python -m pip install -r requirements.txt -U > /dev/null 2>&1
 		deactivate
 		$DirName/$ScriptName &
-		exit_all
+		exit
 	fi
 }
 
