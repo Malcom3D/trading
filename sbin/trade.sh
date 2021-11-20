@@ -23,13 +23,13 @@ trade() {
 	source $DirName/../bin/activate
 	rotate_log $MARKET
 
-	if [ -e $DirName/../etc/common.conf ]
+	if [ -e $DirName/../etc/trade.conf ]
 	then
 		source $DirName/../etc/trade.conf
 	fi
 	local LOG="$DirName/../logs/$MARKET.log"
 	local TRACKER="$DirName/../logs/tracker/$MARKET.csv"
-	until python3.9 pycryptobot.py --config /tmp/$MARKET.json --websocket --logfile $LOG --tradesfile $TRACKER $OPTIONS
+	until python3.9 pycryptobot.py --config /tmp/$MARKET.json $OPTIONS --telegramtradesonly --websocket --logfile $LOG --tradesfile $TRACKER
 	do
 		curl -s "https://api.telegram.org/bot$API_KEY/sendMessage?chat_id=$CHAT_ID&text=Warning: respawning $MARKET process"
 		sleep 1
