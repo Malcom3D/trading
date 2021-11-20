@@ -1,6 +1,7 @@
 #!/bin/bash
 # Define some variable
 DirName=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)
+ScriptName=$(basename "$0")
 
 # Define function
 
@@ -25,8 +26,8 @@ init_git() {
 		source ../bin/activate
 		python -m pip install -r requirements.txt -U > /dev/null 2>&1
 		deactivate
-		kill -9 $(ps -ef | grep trader | grep "daemon\.sh" | head -1 | awk '{print $2}')
-		#sudo systemctl restart trading
+		$DirName/$ScriptName &
+		exit 0
 	fi
 }
 

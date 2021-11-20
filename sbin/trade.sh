@@ -1,6 +1,6 @@
 #!/bin/bash
 # Define some variable
-ScriptName=`basename "$0"`
+ScriptName=$(basename "$0")
 DirName=$(cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P)
 ENABLED="$DirName/../etc/config.d/enabled"
 
