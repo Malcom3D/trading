@@ -500,7 +500,7 @@ get_bot_status() {
 		for l in $started
 		do
 			local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
-			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
+			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2 | awk '{print $1}')
 			if [ -n "$price" ]
 			then
 				if [[ $l =~ "BUSD$" ]]
@@ -510,7 +510,7 @@ get_bot_status() {
 				then
 					val="\€"
 				fi
-				local TEXT=$(echo "$TEXT" && echo "$l" && echo " - Price: $price $val" && echo)
+				local TEXT=$(echo "$TEXT" && echo "$l - Price: $price $val" && echo)
 			fi
 		done
 	else
