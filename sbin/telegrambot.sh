@@ -215,7 +215,7 @@ put_in_row() {
 
 yes_no() {
 	YES_NO=$(jo -a $(jo text="Yes" callback_data="Yes") $(jo text="No" callback_data="No"))
-	local TEXT="$1 Are you sure?"
+	local TEXT="$1"
 	change_last_quest "$TEXT" "$YES_NO"
 	update_msg
 	ANSWER=$(get_answer)
@@ -315,22 +315,22 @@ new_quest() {
 
 	# choose your crypto coin
 	local enabled="$(echo $(bot_enabled) | grep $currency | sed "s/$currency//" )"
-	local availlable=$(ls ../etc/config.d/availlable/ | grep "$currency\.json" | sed "s/$currency\.json//")
+	local available=$(ls ../etc/config.d/available/ | grep "$currency\.json" | sed "s/$currency\.json//")
 	if [ -n "$enabled" ]
 	then
 		for i in $enabled
 		do
-			local availlable=$(echo $availlable | sed "s/$i //")
+			local available=$(echo $available | sed "s/$i //")
 		done
 	fi
 
-	if [ -z "$availlable" ]
+	if [ -z "$available" ]
 	then
 		local TEXT="All bot already enabled."
 		send_msg "$TEXT"
 	else
 		local TEXT="Select crypto to trade:"
-		local ANSWER=$(dialog_msg "$TEXT" "$availlable")
+		local ANSWER=$(dialog_msg "$TEXT" "$available")
 	fi
 
 	local pair="$ANSWER$currency"
@@ -597,8 +597,17 @@ get_sys_status() {
 	change_last_msg "$TEXT"
 }
 
+check_upgrade() {
+	cd $DirName/../
+	git fetch origin > /dev/null 2>&1
+	if [ -n "$(git log HEAD..origin/main --oneline)" ]
+	then
+		local TEXT="A new version of system is available. Install it?
+		yes_no "$TEXT"
+}
+
 system_quest() {
-	local OPT="IP Services ViewLog Restart Reboot Poweroff"
+	local OPT="IP Services ViewLog Upgrade Restart Reboot Poweroff"
 	local TEXT="Select desired action:"
 	ANSWER=$(dialog_msg "$TEXT" "$OPT")
 	if [ -n "$ANSWER" ]
@@ -613,8 +622,11 @@ system_quest() {
 			ViewLog)
 				get_sys_log
 			;;
+			Upgrade)
+				check_upgrade
+			;;
 			Restart)
-				local TEXT="This action will restart all services."
+				local TEXT="This action will restart all services. Are you sure?"
 				if $(yes_no "$TEXT")
 				then
 					local TEXT="Restarting services"
@@ -626,7 +638,7 @@ system_quest() {
 				fi
 			;;
 			Reboot)
-				local TEXT="This action will reboot the system."
+				local TEXT="This action will reboot the system. Are you sure?"
 				if $(yes_no "$TEXT")
 				then
 					local TEXT="Rebooting system"
@@ -638,7 +650,7 @@ system_quest() {
 				fi
 			;;
 			Poweroff)
-				local TEXT="This action will poweroff the system."
+				local TEXT="This action will poweroff the system. Are you sure?"
 				if $(yes_no "$TEXT")
 				then
 					local TEXT="Poweroff system"

@@ -2,6 +2,6 @@
 	path = lib/cryptobot
         url = https://github.com/whittlem/pycryptobot
 [submodule "etc/config.d/availlable"]
-	path = etc/config.d/availlable
+	path = etc/config.d/available
         url = https://github.com/Malcom3D/config
 
