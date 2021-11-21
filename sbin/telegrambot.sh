@@ -131,7 +131,7 @@ get_answer() {
 				fi
 			fi
 		else
-			if [ $timeout -eq 60 ]
+			if [ $timeout -eq 30 ]
 			then
 				local TEXT="Timed out."
 				change_last_msg "$TEXT"
@@ -624,6 +624,45 @@ check_upgrade() {
 	fi
 }
 
+sys_restart() {
+	local TEXT="This action will restart all services. Are you sure?"
+	if $(yes_no "$TEXT")
+	then
+		local TEXT="Restarting services"
+		change_last_msg "$TEXT"
+		./system.sh restart
+	else
+		local TEXT="Restart aborted"
+		change_last_msg "$TEXT"
+	fi
+}
+
+sys_reboot() {
+	local TEXT="This action will reboot the system. Are you sure?"
+	if $(yes_no "$TEXT")
+	then
+		local TEXT="Rebooting system"
+		change_last_msg "$TEXT"
+		./system.sh reboot
+	else
+		local TEXT="Reboot aborted"
+		change_last_msg "$TEXT"
+	fi
+}
+
+sys_poweroff() {
+	local TEXT="This action will poweroff the system. Are you sure?"
+	if $(yes_no "$TEXT")
+	then
+		local TEXT="Poweroff system"
+		change_last_msg "$TEXT"
+		./system.sh poweroff
+	else
+		local TEXT="Poweroff aborted"
+		change_last_msg "$TEXT"
+	fi
+}
+
 system_quest() {
 	local OPT="IP Services ViewLog Upgrade Restart Reboot Poweroff"
 	local TEXT="Select desired action:"
@@ -644,40 +683,13 @@ system_quest() {
 				check_upgrade
 			;;
 			Restart)
-				local TEXT="This action will restart all services. Are you sure?"
-				if $(yes_no "$TEXT")
-				then
-					local TEXT="Restarting services"
-					change_last_msg "$TEXT"
-					./system.sh restart
-				else
-					local TEXT="Restart aborted"
-					change_last_msg "$TEXT"
-				fi
+				sys_restart
 			;;
 			Reboot)
-				local TEXT="This action will reboot the system. Are you sure?"
-				if $(yes_no "$TEXT")
-				then
-					local TEXT="Rebooting system"
-					change_last_msg "$TEXT"
-					./system.sh reboot
-				else
-					local TEXT="Reboot aborted"
-					change_last_msg "$TEXT"
-				fi
+				sys_reboot
 			;;
 			Poweroff)
-				local TEXT="This action will poweroff the system. Are you sure?"
-				if $(yes_no "$TEXT")
-				then
-					local TEXT="Poweroff system"
-					change_last_msg "$TEXT"
-					./system.sh poweroff
-				else
-					local TEXT="Poweroff aborted"
-					change_last_msg "$TEXT"
-				fi
+				sys_poweroff
 			;;
 		esac
 	fi
