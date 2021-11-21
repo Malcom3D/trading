@@ -135,7 +135,7 @@ get_answer() {
 			then
 				local TEXT="Timed out."
 				change_last_msg "$TEXT"
-				break
+				local STATUS=false
 			else
 				((timeout++))
 				sleep 1
