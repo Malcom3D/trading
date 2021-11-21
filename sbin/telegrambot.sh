@@ -297,7 +297,7 @@ dialog_msg() {
 		then
 			echo $ANSWER
 			break
-		elfi [ -n "$ANSWER" ] && [ "$ANSWER" == "timeout" ]
+		elif [ -n "$ANSWER" ] && [ "$ANSWER" == "timeout" ]
 		then
 			local TEXT="Timed out."
 			change_last_msg "$TEXT"
