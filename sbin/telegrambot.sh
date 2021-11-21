@@ -133,16 +133,18 @@ get_answer() {
 		else
 			if [ $timeout -eq 30 ]
 			then
-				local TEXT="Timed out."
-				change_last_msg "$TEXT"
 				local STATUS=false
 			else
 				((timeout++))
-				log "DEBUG: Timeout countdown: $timeout"
 				sleep 1
 			fi
 		fi
 	done
+	if [ $timeout -eq 30 ]
+	then
+		local TEXT="Timed out."
+		change_last_msg "$TEXT"
+	fi
         if [ "$ANS" == "cancel" ]
         then
                 local TEXT="Action cancelled by user."
