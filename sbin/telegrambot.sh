@@ -114,6 +114,7 @@ send_quest() {
 }
 
 get_answer() {
+	timeout=0
 	local STATUS=true
 	while $STATUS
 	do
@@ -130,7 +131,14 @@ get_answer() {
 				fi
 			fi
 		else
-			sleep 1
+			if [ $timeout -eq 60 ]
+			then
+				local TEXT="Timed out."
+				change_last_msg "$TEXT"
+				break
+			else
+				sleep 1
+			fi
 		fi
 	done
         if [ "$ANS" == "cancel" ]
@@ -219,10 +227,10 @@ yes_no() {
 	change_last_quest "$TEXT" "$YES_NO"
 	update_msg
 	ANSWER=$(get_answer)
-	if [ -n "$ANSWER" ] && [ "$(get_answer)" == "Yes" ]
+	if [ -n "$ANSWER" ] && [ "$ANSWER" == "Yes" ]
 	then
 		/usr/bin/true
-	elif [ -n "$ANSWER" ] && [ "$(get_answer)" == "No" ]
+	elif [ -n "$ANSWER" ] && [ "$ANSWER" == "No" ]
 	then
 		/usr/bin/false
 	fi
