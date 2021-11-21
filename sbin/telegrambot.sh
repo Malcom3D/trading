@@ -610,14 +610,16 @@ check_upgrade() {
 	git fetch origin > /dev/null 2>&1
 	if [ -n "$(git log HEAD..origin/main --oneline)" ]
 	then
+		cd -
 		local TEXT="A new version of system is available. Do you want to install it now?"
 		if $(yes_no "$TEXT")
 		then
 			local TEXT="Restarting services and apply upgrade."
 			change_last_msg "$TEXT"
-			sbin/system.sh restart
+			./system.sh restart
 		fi
 	else
+		cd -
 		local TEXT="No new upgrade available"
 		change_last_msg "$TEXT"
 	fi
