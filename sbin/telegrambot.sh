@@ -569,6 +569,10 @@ balance() {
 	send_msg "$(./balance.sh)"
 }
 
+get_ip() {
+	change_last_msg "$(dig +short myip.opendns.com @resolver1.opendns.com)"
+}
+
 get_sys_log() {
 	change_last_msg "$(./system.sh log)"
 }
@@ -594,12 +598,15 @@ get_sys_status() {
 }
 
 system_quest() {
-	local OPT="Services ViewLog Restart Reboot Poweroff"
+	local OPT="IP Services ViewLog Restart Reboot Poweroff"
 	local TEXT="Select desired action:"
 	ANSWER=$(dialog_msg "$TEXT" "$OPT")
 	if [ -n "$ANSWER" ]
 	then
 		case $ANSWER in
+			IP)
+				get_ip
+			;;
 			Services)
 				get_sys_status
 			;;
