@@ -233,7 +233,7 @@ yes_no() {
 	elif [ -n "$ANSWER" ] && [ "$ANSWER" == "No" ]
 	then
 		/usr/bin/false
-	elfi [ -n "$ANSWER" ] && [ "$ANSWER" == "timeout" ]
+	elif [ -n "$ANSWER" ] && [ "$ANSWER" == "timeout" ]
 	then
 		local TEXT="Timed out."
 		change_last_msg "$TEXT"
