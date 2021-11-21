@@ -603,7 +603,7 @@ check_upgrade() {
 	send_msg "$(git log HEAD..origin/main --oneline)"
 	if [ -n "$(git log HEAD..origin/main --oneline)" ]
 	then
-		local TEXT="A new version of system is available. Do you want install it now?"
+		local TEXT="A new version of system is available. Do you want to install it now?"
 		if $(yes_no "$TEXT")
 		then
 			local TEXT="Restarting services and apply upgrade."
