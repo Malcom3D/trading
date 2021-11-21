@@ -114,7 +114,7 @@ send_quest() {
 }
 
 get_answer() {
-	timeout=0
+	local timeout=0
 	local STATUS=true
 	while $STATUS
 	do
@@ -133,6 +133,7 @@ get_answer() {
 		else
 			if [ $timeout -eq 30 ]
 			then
+				local ANS="timeout"
 				local STATUS=false
 			else
 				((timeout++))
@@ -140,11 +141,6 @@ get_answer() {
 			fi
 		fi
 	done
-	if [ $timeout -eq 30 ]
-	then
-		local TEXT="Timed out."
-		change_last_msg "$TEXT"
-	fi
         if [ "$ANS" == "cancel" ]
         then
                 local TEXT="Action cancelled by user."
@@ -237,6 +233,10 @@ yes_no() {
 	elif [ -n "$ANSWER" ] && [ "$ANSWER" == "No" ]
 	then
 		/usr/bin/false
+	elfi [ -n "$ANSWER" ] && [ "$ANSWER" == "timeout" ]
+	then
+		local TEXT="Timed out."
+		change_last_msg "$TEXT"
 	fi
 }
 
@@ -297,6 +297,10 @@ dialog_msg() {
 		then
 			echo $ANSWER
 			break
+		elfi [ -n "$ANSWER" ] && [ "$ANSWER" == "timeout" ]
+		then
+			local TEXT="Timed out."
+			change_last_msg "$TEXT"
 		elif [ -z "$ANSWER" ]
 		then
 			break
