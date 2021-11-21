@@ -707,6 +707,7 @@ exit_all() {
 # update menu list with commands
 log "DEBUG: Updating Menu."
 update_menu
+update_msg
 
 log "INFO: Starting..."
 send_msg "System up and running."
