@@ -38,7 +38,6 @@ exit_all() {
 }
 
 init() {
-	count=0
 	while true
 	do
 		screen -wipe > /dev/null 2>&1
@@ -50,10 +49,6 @@ init() {
 			fi
 		done
 		trap exit_all SIGINT SIGTERM SIGKILL
-		if [ $count -eq 2880 ]
-		then
-			init_git
-		fi
 		sleep 15
 	done
 }
