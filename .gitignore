@@ -3,7 +3,7 @@ etc/keys/*
 etc/trade.conf
 etc/ipcheck/ip.txt
 etc/config.d/enabled/*
-logs/*.log
+logs/bots/*
 logs/tracker/*
 logs/telegrambot/*
 include/*
@@ -13,6 +13,7 @@ pyvenv.cfg
 !lib/cryptobot
 !etc/ipcheck/.gitkeep
 !etc/keys/.gitkeep
+!logs/bots/.gitkeep
 !logs/tracker/.gitkeep
 !logs/telegrambot/.gitkeep
 !etc/config.d/enabled/.gitkeep
