@@ -699,7 +699,7 @@ exit_all() {
 }
 
 # update menu list with commands
-log "DEBUG: Updating Menu"
+log "DEBUG: Updating Menu."
 update_menu
 
 log "INFO: Starting..."
