@@ -606,9 +606,8 @@ get_sys_status() {
 }
 
 check_upgrade() {
-	cd $DirName/../
+	cd ../
 	git fetch origin > /dev/null 2>&1
-	change_last_msg "$(git log HEAD..origin/main --oneline)"
 	if [ -n "$(git log HEAD..origin/main --oneline)" ]
 	then
 		local TEXT="A new version of system is available. Do you want to install it now?"
@@ -616,7 +615,7 @@ check_upgrade() {
 		then
 			local TEXT="Restarting services and apply upgrade."
 			change_last_msg "$TEXT"
-			./system.sh restart
+			sbin/system.sh restart
 		fi
 	else
 		local TEXT="No new upgrade available"
