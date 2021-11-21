@@ -27,7 +27,7 @@ trade() {
 	then
 		source $DirName/../etc/trade.conf
 	fi
-	local LOG="$DirName/../logs/$MARKET.log"
+	local LOG="$DirName/../logs/bots/$MARKET.log"
 	local TRACKER="$DirName/../logs/tracker/$MARKET.csv"
 	until python3.9 pycryptobot.py --config /tmp/$MARKET.json $OPTIONS --telegramtradesonly --websocket --logfile $LOG --tradesfile $TRACKER
 	do
@@ -64,7 +64,7 @@ rotate_log() {
                 if [ -n "$lastOld" ] && [ -e "$DirName/../logs/$lastOld" ]
                 then
                         version=$[ $k +1 ]
-                        mv $DirName/../logs/$lastOld $DirName/../logs/$MARKET.log.$version
+                        mv $DirName/../logs/bots/$lastOld $DirName/../logs/bots/$MARKET.log.$version
                 fi
         done
 }
@@ -88,7 +88,7 @@ log() {
 		for l in $LOGS
 		do
 			echo "==> $l.log <=="
-			tail -n 100 $DirName/../logs/$l.log | egrep -v "$l$|BUSD$|EUR$|^$|DEBUG" | tail -n $lines
+			tail -n 100 $DirName/../logs/bots/$l.log | egrep -v "$l$|BUSD$|EUR$|^$|DEBUG" | tail -n $lines
 		done
 	fi
 }

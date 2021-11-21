@@ -298,6 +298,7 @@ dialog_msg() {
 
 new_quest() {
 	# Currency list
+	#local CURR_LIST="USDT TUSD PAX USDC BUSD NGN RUB TRY EUR IDRT GBP UAH BIDR AUD DAI BRL USDP"
 	local CURR_LIST="EUR BUSD"
 
 	# choose your currency
@@ -499,7 +500,7 @@ get_bot_status() {
 	then
 		for l in $started
 		do
-			local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
+			local info=$(tail -n 12 ../logs/bots/$l.log | grep INFO | tail -1)
 			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2 | awk '{print $1}')
 			if [ -n "$price" ]
 			then
@@ -525,7 +526,7 @@ get_margin() {
 	then
 		for l in $started
 		do
-			local info=$(tail -n 12 ../logs/$l.log | grep INFO | tail -1)
+			local info=$(tail -n 12 ../logs/bots/$l.log | grep INFO | tail -1)
 			local price=$(echo $info | cut -d"|" -f4 | cut -d":" -f2)
 			local margin=$(echo $info | grep "Margin" | cut -d"|" -f5 | cut -d":" -f2)
 			local profit=$(echo $info | grep "Profit" | cut -d"|" -f6 | cut -d":" -f2)
