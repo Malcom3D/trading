@@ -600,7 +600,7 @@ get_sys_status() {
 check_upgrade() {
 	cd $DirName/../
 	git fetch origin > /dev/null 2>&1
-	send_msg "$(git log HEAD..origin/main --oneline)"
+	change_last_msg "$(git log HEAD..origin/main --oneline)"
 	if [ -n "$(git log HEAD..origin/main --oneline)" ]
 	then
 		local TEXT="A new version of system is available. Do you want to install it now?"
