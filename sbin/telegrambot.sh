@@ -422,7 +422,7 @@ start_all() {
 			send_msg "$TEXT"
 		done
 	else
-		local TEXT="No bot enabled."
+		local TEXT="All enabled bot already enabled."
 		send_msg "$TEXT"
 	fi
 }
