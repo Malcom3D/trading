@@ -64,11 +64,6 @@ help() {
 	printf "$HELP\n$STATUS\n$MARGIN\n$TRADES\n$BALANCE\n$START\n$STOP\n$RESTART\n$NEW\n$DEL\n$SYSTEM"
 }
 
-# Get date of lastest message in buffer
-last_msg() {
-        curl -s -X GET $GET_URL | jq -r ' .result[-1] | if has("callback_query") then .callback_query.message else .message end | .date'
-}
-
 get_cmd() {
         curl -s -X GET $GET_URL | jq -r '.result[-1].message | select ( .entities[0].type=="bot_command" ) | .text'
 }
@@ -82,11 +77,13 @@ send_msg() {
 }
 
 change_last_msg() {
+	local TEXT=$1
 	local MESSAGE_ID=$(curl -s -X GET $GET_URL | jq -r '.result[-1] | .callback_query.message.message_id')
-	until $(curl -s -d chat_id=$CHAT_ID -d message_id=$MESSAGE_ID -d text="$1" -X POST $EDIT_URL | jq .ok)
+	until $(curl -s -d chat_id=$CHAT_ID -d message_id=$MESSAGE_ID -d text="$TEXT" -X POST $EDIT_URL | jq .ok)
 	do
 		log "DEBUG: Unable to change last message. Sleeping."
 		sleep 1
+		local MESSAGE_ID=$(curl -s -X GET $GET_URL | jq -r '.result[-1] | .callback_query.message.message_id')
 	done
 }
 
@@ -99,6 +96,7 @@ change_last_quest() {
 	do
 		log "DEBUG: Unable to change last quest message. Sleeping."
 		sleep 1
+		local MESSAGE_ID=$(curl -s -X GET $GET_URL | jq -r '.result[-1] | .callback_query.message.message_id')
 	done
 }
 	
@@ -114,7 +112,6 @@ send_quest() {
 }
 
 get_answer() {
-	local timeout=0
 	local STATUS=true
 	while $STATUS
 	do
@@ -131,20 +128,13 @@ get_answer() {
 				fi
 			fi
 		else
-			if [ $timeout -eq 30 ]
-			then
-				local ANS="timeout"
-				local STATUS=false
-			else
-				((timeout++))
-				sleep 1
-			fi
+			sleep 1
 		fi
 	done
         if [ "$ANS" == "cancel" ]
         then
-                local TEXT="Action cancelled by user."
-                change_last_msg "$TEXT"
+		local TEXT="Action cancelled by user."
+		change_last_msg "$TEXT"
         else
 		echo $ANS
 	fi
@@ -225,7 +215,7 @@ yes_no() {
 	YES_NO=$(jo -a $(jo text="Yes" callback_data="Yes") $(jo text="No" callback_data="No"))
 	local TEXT="$1"
 	change_last_quest "$TEXT" "$YES_NO"
-	update_msg
+	#update_msg
 	ANSWER=$(get_answer)
 	if [ -n "$ANSWER" ] && [ "$ANSWER" == "Yes" ]
 	then
@@ -233,10 +223,6 @@ yes_no() {
 	elif [ -n "$ANSWER" ] && [ "$ANSWER" == "No" ]
 	then
 		/usr/bin/false
-	elif [ -n "$ANSWER" ] && [ "$ANSWER" == "timeout" ]
-	then
-		local TEXT="Timed out."
-		change_last_msg "$TEXT"
 	fi
 }
 
@@ -284,7 +270,7 @@ dialog_msg() {
 
 	while true
 	do
-		update_msg
+		#update_msg
 		local ANSWER=$(get_answer)
 
 		if [ "$ANSWER" == "PrevPage" ]
@@ -297,10 +283,6 @@ dialog_msg() {
 		then
 			echo $ANSWER
 			break
-		elif [ -n "$ANSWER" ] && [ "$ANSWER" == "timeout" ]
-		then
-			local TEXT="Timed out."
-			change_last_msg "$TEXT"
 		elif [ -z "$ANSWER" ]
 		then
 			break
@@ -327,7 +309,7 @@ new_quest() {
 	fi
 	local TEXT="Trading in $currency."
 	change_last_msg "$TEXT"
-	update_msg
+	#update_msg
 
 	# choose your crypto coin
 	local enabled="$(echo $(bot_enabled) | grep $currency | sed "s/$currency//" )"
@@ -719,9 +701,6 @@ send_msg "System up and running."
 log "INFO: Start all enabled bot."
 send_msg "Start all enabled bot."
 start_all
-
-# set init var
-LAST_MSG=$(last_msg)
 
 log "DEBUG: starting main loop"
 while true
