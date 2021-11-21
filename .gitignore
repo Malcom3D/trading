@@ -1,6 +1,7 @@
 bin/*
 etc/keys/*
 etc/trade.conf
+etc/ipcheck/ip.txt
 etc/config.d/enabled/*
 logs/*.log
 logs/tracker/*
