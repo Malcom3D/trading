@@ -138,6 +138,7 @@ get_answer() {
 				local STATUS=false
 			else
 				((timeout++))
+				log "DEBUG: Timeout countdown: $timeout"
 				sleep 1
 			fi
 		fi
