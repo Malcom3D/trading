@@ -137,6 +137,7 @@ get_answer() {
 				change_last_msg "$TEXT"
 				break
 			else
+				((timeout++))
 				sleep 1
 			fi
 		fi
