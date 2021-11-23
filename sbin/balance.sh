@@ -21,7 +21,6 @@ balance() {
 
 	local FULL_WALLET=$(curl -s -S -H "X-MBX-APIKEY: $APIKEY" -X GET "https://api.binance.com/api/v3/account?recvWindow=$RECVWINDOW&timestamp=$TM&signature=$GET_BALANCE_SIG")
 	local ASSET=$(echo $FULL_WALLET | jq -r ".balances[] | select(.free>=\"0.00000001\") | .asset")
-
 	local ESTIMATED="0"
 	for i in $ASSET
 	do
@@ -29,14 +28,16 @@ balance() {
 		local FREE=$(echo $FULL_WALLET | jq -r ".balances[] | select(.asset==\"$i\") | .free")
 		local LOCKED=$(echo $FULL_WALLET | jq -r ".balances[] | select(.asset==\"$i\") | .locked")
 		local VALUE=$(echo "$FREE + $LOCKED" | bc -l)
-		if [[ $i =~ "BUSD" ]]
+		if [[ "$i" == "EUR" ]]
 		then
-			local CURR_PRICE=$(curl -s -S -X GET "https://api.binance.com/api/v3/ticker/price?symbol="$i"BUSD" | jq -r ".price")
-			local VALUE_EUR=$(echo "scale=8;$VALUE * $PRICE * $CURR_PRICE" | bc -l)
+			local PRICE=1
+		elif [[ "$i" == "BUSD" ]]
+		then
+			local PRICE=$(curl -s -S -X GET "https://api.binance.com/api/v3/ticker/price?symbol=EURBUSD" | jq -r ".price")
 		else
 			local PRICE=$(curl -s -S -X GET "https://api.binance.com/api/v3/ticker/price?symbol="$i"EUR" | jq -r ".price")
-			local VALUE_EUR=$(echo "scale=8;$VALUE * $PRICE" | bc -l)
 		fi
+		local VALUE_EUR=$(echo "scale=8;$VALUE * $PRICE" | bc -l)
 		local ESTIMATED=$(echo "scale=8;$ESTIMATED + $VALUE_EUR" | bc -l)
 		echo "$i: $VALUE"
 	done
