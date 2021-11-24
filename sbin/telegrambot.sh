@@ -152,11 +152,14 @@ update_msg() {
 }
 
 bot_enabled() {
-	local files=(../etc/config.d/enabled/*.json)
-	if [ -e "${files[0]}" ]
-	then
-        	echo "$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')"
-	fi
+	for i in etc/config.d/enabled/*.json
+	do
+		if [ -h $i ]
+		then
+        		echo "$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')"
+			break
+		fi
+	done
 }
 
 bot_started() {
@@ -177,9 +180,7 @@ bot_started() {
 
 bot_unstarted() {
 	local started="$(bot_started)"
-	log "DEBUG: bot_unstarted: started bot: $started"
 	local unstarted="$(bot_enabled)"
-	log "DEBUG: bot_unstarted: enabled bot: $unstarted"
 	if [ -n "$started" ]
 	then
 		for i in "$started"
@@ -187,7 +188,6 @@ bot_unstarted() {
 			local unstarted="$(echo "$unstarted" | sed "s/$i//")"
 		done
 	fi
-	log "DEBUG: bot_unstarted: unstarted bot: $unstarted"
 	echo "$unstarted"
 }
 
