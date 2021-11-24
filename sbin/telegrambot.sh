@@ -635,7 +635,6 @@ check_upgrade() {
 		then
 			local TEXT="Restarting services and apply upgrade."
 			change_last_msg "$TEXT"
-			rm ../etc/config.d/.upgrade
 			./system.sh restart
 		else
 			local TEXT="System will be upgraded the next restart."
