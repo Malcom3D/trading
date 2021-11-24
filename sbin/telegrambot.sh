@@ -21,8 +21,12 @@ CONTENT="Content-Type: application/json"
 
 # logger funtion
 log() {
-	#echo "$(date) $1" | tee -a /dev/null
-	echo "$(date) $1" >> ../logs/telegrambot/telegrambot.log
+	if [ -z "$DEBUG" ] && [[ $1 =~ "DEBUG" ]]
+	then
+		return
+	else
+		echo "$(date) $1" >> ../logs/telegrambot/telegrambot.log
+	fi
 }
 
 # update bot commands menu
