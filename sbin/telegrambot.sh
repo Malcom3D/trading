@@ -621,6 +621,7 @@ check_upgrade() {
 	if [ -n "$(git log HEAD..origin/main --oneline)" ]
 	then
 		cd - > /dev/null 2>&1
+		touch ../etc/config.d/.upgrade
 		local TEXT="A new version of system is available. Do you want to install it now?"
 		if $(yes_no "$TEXT")
 		then

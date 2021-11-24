@@ -54,5 +54,9 @@ init() {
 	done
 }
 
-init_git
+if [ -e ../etc/config.d/.upgrade ]
+then
+	rm ../etc/config.d/.upgrade
+	init_git
+fi
 init
