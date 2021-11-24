@@ -396,6 +396,7 @@ del_quest() {
 }
 
 start_quest() {
+	local ANSWER=""
 	local unstarted="$(bot_unstarted)"
 	if [ -z "$unstarted" ]
 	then
