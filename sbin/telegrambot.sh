@@ -299,7 +299,7 @@ dialog_msg() {
 		elif [ "$ANSWER" == "NextPage" ]
 		then
 			((num++))
-		elif [ -n "$ANSWER" ] && [[ $LIST =~ $ANSWER ]]
+		elif [ -n "$ANSWER" ] && [[ $LIST =~ $ANSWER  || $OPTIONS =~ $ANSWER ]]
 		then
 			echo $ANSWER
 			break
