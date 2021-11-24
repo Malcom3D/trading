@@ -154,12 +154,14 @@ update_msg() {
 bot_enabled() {
 	for i in etc/config.d/enabled/*.json
 	do
-		if [ -h $i ]
+		if [ -h "$i" ]
 		then
-        		echo "$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')"
+        		local enabled="$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')"
+			log "DEBUG: bot_enabled: $enabled"
 			break
 		fi
 	done
+	echo $enabled
 }
 
 bot_started() {
