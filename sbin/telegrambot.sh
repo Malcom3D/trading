@@ -96,6 +96,8 @@ change_last_quest() {
 	until $(curl -s -d "$JSON" -H "$CONTENT" -X POST $EDIT_URL | jq .ok)
 	do
 		log "DEBUG: Unable to change last quest message. Sleeping."
+		log "DEBUG: TEXT: $TEXT"
+		log "DEBUG: ROW: $ROW"
 		sleep 1
 		local MESSAGE_ID=$(curl -s -X GET $GET_URL | jq -r '.result[-1] | .callback_query.message.message_id')
 	done
