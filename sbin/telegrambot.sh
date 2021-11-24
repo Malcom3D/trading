@@ -163,8 +163,8 @@ bot_enabled() {
 			break
 		fi
 	done
-	log "DEBUG: bot_enabled: final: ${enabled%?}"
-	echo ${enabled%?}
+	log "DEBUG: bot_enabled: final: $enabled"
+	echo "$enabled"
 }
 
 bot_started() {
