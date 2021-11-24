@@ -164,11 +164,10 @@ bot_enabled() {
 		fi
 	done
 	log "DEBUG: bot_enabled: $enabled"
-	echo $enabled
+	echo "$enabled"
 }
 
 bot_started() {
-	local started=""
 	local enabled="$(bot_enabled)"
 	log "DEBUG: bot_started: enabled: $enabled"
 	if [ -n "$enabled" ]
@@ -180,6 +179,8 @@ bot_started() {
 				local started="$started $i"
 			fi
 		done
+	else
+		log "DEBUG: bot_started: enabled is empty var"
 	fi
 	log "DEBUG: bot_started: started: $started"
 	echo "$started"
@@ -198,7 +199,7 @@ bot_unstarted() {
 			log "DEBUG: bot_unstarted: unstarted loop: $unstarted"
 		done
 	else
-			log "DEBUG: bot_unstarted: unstarted loop: $started is empty var"
+			log "DEBUG: bot_unstarted: unstarted loop: started is empty var"
 	fi
 	log "DEBUG: bot_unstarted: unstarted: $unstarted"
 	echo "$unstarted"
