@@ -177,11 +177,14 @@ bot_started() {
 
 bot_unstarted() {
 	local started="$(bot_started)"
+	log "DEBUG: bot_unstarted: started bot: $started"
 	local unstarted="$(bot_enabled)"
+	log "DEBUG: bot_unstarted: enabled bot: $unstarted"
 	for i in "$started"
 	do
 		local unstarted="$(echo "$unstarted" | sed "s/$i//")"
 	done
+	log "DEBUG: bot_unstarted: unstarted bot: $unstarted"
 	echo "$unstarted"
 }
 
