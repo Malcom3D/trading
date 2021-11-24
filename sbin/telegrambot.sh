@@ -159,12 +159,10 @@ bot_enabled() {
         		local enabled="$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')"
 			log "DEBUG: bot_enabled: $enabled"
 			break
-		else
-			log "DEBUG: bot_enabled: $i not link"
 		fi
 	done
-	log "DEBUG: bot_enabled: $enabled"
-	echo "$enabled"
+	log "DEBUG: bot_enabled: ${enabled%?}"
+	echo ${enabled%?}
 }
 
 bot_started() {
@@ -196,8 +194,8 @@ bot_unstarted() {
 		for i in $started
 		do
 			log "DEBUG: bot_unstarted: unstarted loop before: $unstarted $i"
-			local unstarted="$(echo "$unstarted" | sed "/$i/d")"
-			log "DEBUG: bot_unstarted: unstarted loop after: $unstarted $i"
+			local unstarted="$(echo "$unstarted" | sed "s/$i//")"
+			log "DEBUG: bot_unstarted: unstarted loop after: $unstarted"
 		done
 	else
 			log "DEBUG: bot_unstarted: unstarted loop: started is empty var"
