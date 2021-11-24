@@ -54,9 +54,9 @@ init() {
 	done
 }
 
-if [ -e ../etc/config.d/.upgrade ]
+if [ -e $DirName/../etc/config.d/.upgrade ]
 then
-	rm ../etc/config.d/.upgrade
+	rm $DirName/../etc/config.d/.upgrade
 	init_git
 fi
 init
