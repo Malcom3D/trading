@@ -21,7 +21,8 @@ CONTENT="Content-Type: application/json"
 
 # logger funtion
 log() {
-	echo "$(date) $1" | tee -a /dev/null
+	#echo "$(date) $1" | tee -a /dev/null
+	echo "$(date) $1" | tee -a ../logs/telegrambot/telegrambot.log
 }
 
 # update bot commands menu
@@ -215,7 +216,7 @@ yes_no() {
 	YES_NO=$(jo -a $(jo text="Yes" callback_data="Yes") $(jo text="No" callback_data="No"))
 	local TEXT="$1"
 	change_last_quest "$TEXT" "$YES_NO"
-	#update_msg
+	update_msg
 	ANSWER=$(get_answer)
 	if [ -n "$ANSWER" ] && [ "$ANSWER" == "Yes" ]
 	then
@@ -270,7 +271,7 @@ dialog_msg() {
 
 	while true
 	do
-		#update_msg
+		update_msg
 		local ANSWER=$(get_answer)
 
 		if [ "$ANSWER" == "PrevPage" ]
@@ -309,7 +310,7 @@ new_quest() {
 	fi
 	local TEXT="Trading in $currency."
 	change_last_msg "$TEXT"
-	#update_msg
+	update_msg
 
 	# choose your crypto coin
 	local enabled="$(echo $(bot_enabled) | grep $currency | sed "s/$currency//" )"
@@ -336,7 +337,7 @@ new_quest() {
 	then
 		if [ "$(./trade.sh enable $pair)" ]
 		then
-			local TEXT="$ANSWER->$currency 1 bot enabled."
+			local TEXT="$ANSWER->$currency bot enabled."
 		else
 			local TEXT="WARNING: error enabling $ANSWER->$currency bot."
 		fi
