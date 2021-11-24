@@ -735,7 +735,7 @@ send_msg "System up and running."
 
 log "INFO: Start all enabled bot."
 send_msg "Start all enabled bot."
-#start_all
+start_all
 
 log "DEBUG: starting main loop"
 while true
