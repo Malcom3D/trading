@@ -27,7 +27,8 @@ init_git() {
 		source $DirName/../bin/activate
 		python -m pip install -r requirements.txt -U > /dev/null 2>&1
 		deactivate
-		sudo /usr/bin/systemctl restart trading
+		cd $DirName
+		./system.sh restart
 	fi
 }
 

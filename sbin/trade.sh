@@ -43,7 +43,7 @@ stop() {
 
 enable() {
 	cd $ENABLED
-	ln -s ../availlable/$MARKET.json
+	ln -s ../available/$MARKET.json
 	echo $?
 }
 
