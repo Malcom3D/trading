@@ -618,15 +618,15 @@ get_sys_status() {
 }
 
 check_upgrade() {
-	if ! [ -e ../etc/config.d/.upgrade ]
+	if [ ! -e ../etc/config.d/.upgrade ]
 	then
 		cd ../
 		git fetch origin > /dev/null 2>&1
 		if [ -n "$(git log HEAD..origin/main --oneline)" ]
 		then
+			cd - > /dev/null 2>&1
 			touch ../etc/config.d/.upgrade
 		fi
-		cd - > /dev/null 2>&1
 	fi
 	if [ -e ../etc/config.d/.upgrade ]
 	then
