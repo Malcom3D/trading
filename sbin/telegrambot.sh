@@ -152,7 +152,7 @@ update_msg() {
 }
 
 bot_enabled() {
-	for i in etc/config.d/enabled/*.json
+	for i in ../etc/config.d/enabled/*.json
 	do
 		if [ -h "$i" ]
 		then
