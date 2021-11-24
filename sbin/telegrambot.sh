@@ -159,11 +159,11 @@ bot_enabled() {
 		if [ -h "$i" ]
 		then
         		local enabled="$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')"
-			log "DEBUG: bot_enabled: $enabled"
+			log "DEBUG: bot_enabled: check loop $enabled"
 			break
 		fi
 	done
-	log "DEBUG: bot_enabled: ${enabled%?}"
+	log "DEBUG: bot_enabled: final: ${enabled%?}"
 	echo ${enabled%?}
 }
 
