@@ -195,13 +195,14 @@ bot_unstarted() {
 	then
 		for i in "$started"
 		do
+			log "DEBUG: bot_unstarted: unstarted loop before: $unstarted $i"
 			local unstarted="$(echo "$unstarted" | sed "s/$i//")"
-			log "DEBUG: bot_unstarted: unstarted loop: $unstarted"
+			log "DEBUG: bot_unstarted: unstarted loop after: $unstarted $i"
 		done
 	else
 			log "DEBUG: bot_unstarted: unstarted loop: started is empty var"
 	fi
-	log "DEBUG: bot_unstarted: unstarted: $unstarted"
+	log "DEBUG: bot_unstarted: unstarted end: $unstarted"
 	echo "$unstarted"
 }
 
