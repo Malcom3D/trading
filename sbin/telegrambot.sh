@@ -180,7 +180,7 @@ bot_unstarted() {
 	log "DEBUG: bot_unstarted: started bot: $started"
 	local unstarted="$(bot_enabled)"
 	log "DEBUG: bot_unstarted: enabled bot: $unstarted"
-	if [ -n "$unstarted" ]
+	if [ -n "$started" ]
 	then
 		for i in "$started"
 		do
