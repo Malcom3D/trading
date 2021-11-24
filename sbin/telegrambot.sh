@@ -187,8 +187,8 @@ bot_started() {
 
 bot_unstarted() {
 	local started="$(bot_started)"
-	log "DEBUG: bot_unstarted: started: $started"
 	local unstarted="$(bot_enabled)"
+	log "DEBUG: bot_unstarted: started: $started"
 	log "DEBUG: bot_unstarted: enabled: $unstarted"
 	if [ -n "$started" ]
 	then
