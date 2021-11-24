@@ -19,6 +19,8 @@ PREV_PAGE=$(jo -a $(jo text="<-Prev" callback_data="PrevPage"))
 NEXT_PAGE=$(jo -a $(jo text="Next->" callback_data="NextPage"))
 CONTENT="Content-Type: application/json"
 
+DEBUG=1
+
 # logger funtion
 log() {
 	if [ -z "$DEBUG" ] && [[ $1 =~ "DEBUG" ]]
@@ -690,9 +692,9 @@ sys_poweroff() {
 }
 
 system_quest() {
-	local OPT="IP Services ViewLog Upgrade Restart Reboot Poweroff"
+	local SYSCMD="IP Services ViewLog Upgrade Restart Reboot Poweroff"
 	local TEXT="Select desired action:"
-	ANSWER=$(dialog_msg "$TEXT" "$OPT")
+	ANSWER=$(dialog_msg "$TEXT" "$SYSCMD")
 	if [ -n "$ANSWER" ]
 	then
 		case $ANSWER in
