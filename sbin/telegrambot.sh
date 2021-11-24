@@ -159,14 +159,18 @@ bot_enabled() {
         		local enabled="$(ls ../etc/config.d/enabled/ | grep "\.json" | sed 's/\.json//')"
 			log "DEBUG: bot_enabled: $enabled"
 			break
+		else
+			log "DEBUG: bot_enabled: $i not link"
 		fi
 	done
+	log "DEBUG: bot_enabled: $enabled"
 	echo $enabled
 }
 
 bot_started() {
 	local started=""
 	local enabled="$(bot_enabled)"
+	log "DEBUG: bot_started: enabled: $enabled"
 	if [ -n "$enabled" ]
 	then
 		for i in "$enabled"
@@ -177,6 +181,7 @@ bot_started() {
 			fi
 		done
 	fi
+	log "DEBUG: bot_started: started: $started"
 	echo "$started"
 }
 
