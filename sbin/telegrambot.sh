@@ -748,7 +748,7 @@ do
 				send_msg "Hei man, I'm only a bot"
 			;;
 		esac
-		trap exit_all SIGINT SIGTERM SIGKILL
+		#trap exit_all SIGINT SIGTERM SIGKILL
 		update_msg
 	fi
 done
