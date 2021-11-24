@@ -372,7 +372,7 @@ start_quest() {
 	local unstarted="$(bot_unstarted)"
 	if [ -z "$unstarted" ]
 	then
-		local TEXT="No bot enabled."
+		local TEXT="No bot to start."
 		send_msg "$TEXT"
 	else
 		local TEXT="Select crypto to trade:"
