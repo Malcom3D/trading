@@ -22,7 +22,7 @@ CONTENT="Content-Type: application/json"
 # logger funtion
 log() {
 	#echo "$(date) $1" | tee -a /dev/null
-	echo "$(date) $1" | tee -a ../logs/telegrambot/telegrambot.log
+	echo "$(date) $1" >> ../logs/telegrambot/telegrambot.log
 }
 
 # update bot commands menu
@@ -164,7 +164,7 @@ bot_started() {
 	local enabled="$(bot_enabled)"
 	if [ -n "$enabled" ]
 	then
-		for i in $enabled
+		for i in "$enabled"
 		do
 			if [ "$(./trade.sh status $i)" ]
 			then
@@ -178,9 +178,9 @@ bot_started() {
 bot_unstarted() {
 	local started="$(bot_started)"
 	local unstarted="$(bot_enabled)"
-	for i in $started
+	for i in "$started"
 	do
-		local unstarted="$(echo $unstarted | sed "s/$i//")"
+		local unstarted="$(echo "$unstarted" | sed "s/$i//")"
 	done
 	echo "$unstarted"
 }
