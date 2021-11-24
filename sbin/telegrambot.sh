@@ -193,7 +193,7 @@ bot_unstarted() {
 	log "DEBUG: bot_unstarted: enabled: $unstarted"
 	if [ -n "$started" ]
 	then
-		for i in "$started"
+		for i in $started
 		do
 			log "DEBUG: bot_unstarted: unstarted loop before: $unstarted $i"
 			local unstarted="$(echo "$unstarted" | sed "s/$i//")"
