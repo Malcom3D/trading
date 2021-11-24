@@ -147,6 +147,7 @@ get_answer() {
         else
 		echo $ANS
 	fi
+	update_msg
 }
 
 update_msg() {
