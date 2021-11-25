@@ -84,7 +84,7 @@ log() {
 	num=$(echo $LOGS | wc -w)
 	if [ "$num" -gt 0 ]
 	then
-		lines=$[ 40 / $num ]
+		lines=$[ 60 / $num ]
 		for l in $LOGS
 		do
 			echo "==> $l.log <=="
