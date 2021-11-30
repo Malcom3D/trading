@@ -437,6 +437,7 @@ start_all() {
 		                local TEXT="WARNING: error starting $i bot."
 			fi
 			send_msg "$TEXT"
+			sleep 10
 		done
 	else
 		local TEXT="All enabled bot already enabled."
