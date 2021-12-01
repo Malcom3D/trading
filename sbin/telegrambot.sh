@@ -19,7 +19,7 @@ PREV_PAGE=$(jo -a $(jo text="<-Prev" callback_data="PrevPage"))
 NEXT_PAGE=$(jo -a $(jo text="Next->" callback_data="NextPage"))
 CONTENT="Content-Type: application/json"
 
-DEBUG=1
+#DEBUG=1
 
 # logger funtion
 log() {
