@@ -5,7 +5,7 @@ Conflicts=getty@tty1.service
 
 [Service]
 User=trader
-ExecStart=/usr/bin/watch 'clear && /home/trader/trading/sbin/trade.sh log
+ExecStart=/usr/bin/watch 'clear && /home/trader/trading/sbin/trade.sh log'
 StandardInput=tty-force
 StandardOutput=inherit
 StandardError=inherit
